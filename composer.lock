@@ -4,9 +4,58 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "705e7716f609c32a0b72136bb0dc8172",
-    "content-hash": "55b311b9889ea3f7d78f91850500d2fb",
+    "hash": "f7b876345e3307fa71e5440a71ca335a",
+    "content-hash": "8361a964a840a65ea5106c970a804d47",
     "packages": [
+        {
+            "name": "openid/php-openid",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/openid/php-openid.git",
+                "reference": "ee669c6a9d4d95b58ecd9b6945627276807694fb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/openid/php-openid/zipball/ee669c6a9d4d95b58ecd9b6945627276807694fb",
+                "reference": "ee669c6a9d4d95b58ecd9b6945627276807694fb",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-dom": "*",
+                "ext-gmp": "*",
+                "php": ">=4.3"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "Auth"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "."
+            ],
+            "license": [
+                "Apache-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "JanRain Inc.",
+                    "homepage": "http://www.openidenabled.com"
+                }
+            ],
+            "description": "OpenID library for PHP5",
+            "homepage": "http://github.com/openid/php-openid",
+            "keywords": [
+                "Authentication",
+                "OpenId",
+                "auth",
+                "yadis"
+            ],
+            "time": "2013-10-03 21:21:20"
+        },
         {
             "name": "psr/log",
             "version": "1.0.0",
@@ -87,6 +136,36 @@
             "time": "2015-07-31 15:08:38"
         },
         {
+            "name": "simplesamlphp/composer-module-installer",
+            "version": "v1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/simplesamlphp/composer-module-installer.git",
+                "reference": "3c89dfcbf89c055c6327424fbfa15e71eb48be9e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/simplesamlphp/composer-module-installer/zipball/3c89dfcbf89c055c6327424fbfa15e71eb48be9e",
+                "reference": "3c89dfcbf89c055c6327424fbfa15e71eb48be9e",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "SimpleSamlPhp\\Composer\\ModuleInstallerPlugin"
+            },
+            "autoload": {
+                "psr-0": {
+                    "SimpleSamlPhp\\Composer": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "A Composer plugin that allows installing SimpleSAMLphp modules through Composer.",
+            "time": "2016-06-30 11:33:43"
+        },
+        {
             "name": "simplesamlphp/saml2",
             "version": "dev-master",
             "source": {
@@ -137,6 +216,51 @@
             ],
             "description": "SAML2 PHP library from SimpleSAMLphp",
             "time": "2016-07-26 13:28:46"
+        },
+        {
+            "name": "simplesamlphp/simplesamlphp-module-openid",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/simplesamlphp/simplesamlphp-module-openid.git",
+                "reference": "b1f406c8850024d6430d07a1efa6ca98bf8e0e92"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/simplesamlphp/simplesamlphp-module-openid/zipball/b1f406c8850024d6430d07a1efa6ca98bf8e0e92",
+                "reference": "b1f406c8850024d6430d07a1efa6ca98bf8e0e92",
+                "shasum": ""
+            },
+            "require": {
+                "openid/php-openid": "dev-master#ee669c6a9d4d95b58ecd9b6945627276807694fb as 2.2.2",
+                "simplesamlphp/composer-module-installer": "~1.0"
+            },
+            "type": "simplesamlphp-module",
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-2.1"
+            ],
+            "authors": [
+                {
+                    "name": "Olav Morken",
+                    "email": "olav.morken@uninett.no"
+                },
+                {
+                    "name": "Andreas Åkre Solberg",
+                    "email": "andreas.solberg@uninett.no"
+                },
+                {
+                    "name": "Andjelko Horvat",
+                    "email": "comel@vingd.com"
+                }
+            ],
+            "description": "A SimpleSAMLphp module adding support for the OpenID protocol.",
+            "homepage": "http://simplesamlphp.org",
+            "keywords": [
+                "OpenId",
+                "consumer"
+            ],
+            "time": "2016-03-09 13:05:21"
         },
         {
             "name": "twig/twig",
@@ -1150,11 +1274,18 @@
             "alias_normalized": "2.2.0.0",
             "version": "9999999-dev",
             "package": "simplesamlphp/saml2"
+        },
+        {
+            "alias": "2.2.2",
+            "alias_normalized": "2.2.2.0",
+            "version": "9999999-dev",
+            "package": "openid/php-openid"
         }
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "simplesamlphp/saml2": 20
+        "simplesamlphp/saml2": 20,
+        "openid/php-openid": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

@@ -161,3 +161,7 @@ crashlytics-build.properties
 
 ### Vagrant ###
 .vagrant/
+
+### Eclipse ###
+.buildpath
+.settings/
