@@ -1,0 +1,29 @@
+{
+	"login_help": {
+		"en": "How to login"
+	},
+	"registration": {
+		"en": "Registration"
+        },
+	"login_comment": {
+		"en": "Once logged in you can browse online catalogue, databases and submit comments on our web"
+	},
+	"forgotten_login": {
+		"en": "Card number recovery"
+	},
+	"password_recovery": {
+		"en": "Password recovery"
+	},
+	"institution_login": {
+		"en": "Institution login"
+	},
+	"remember_me": {
+		"en": "Remember me"
+	},
+	"help": {
+		"en": "help"
+	},
+	"maintenance_in_progress" : {
+		"en": "You can't login at this time. Maintenance in progress."
+	}
+}
