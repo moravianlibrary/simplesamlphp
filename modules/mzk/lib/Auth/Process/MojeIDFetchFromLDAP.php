@@ -2,9 +2,9 @@
 
 class sspmod_mzk_Auth_Process_mojeIDFetchFromLDAP extends SimpleSAML_Auth_ProcessingFilter {
 
-	private $sourceId;
+	private $source;
 	
-	private $attributeName;
+	private $attribute;
 
 	/**
 	 * Initialize this filter.
@@ -28,9 +28,8 @@ class sspmod_mzk_Auth_Process_mojeIDFetchFromLDAP extends SimpleSAML_Auth_Proces
 		$attributes = &$request['Attributes'];
 		if (isset($attributes['openid.local_id'])) {
 			$openId = $attributes['openid.local_id'][0];
-			$source = SimpleSAML_Auth_Source::getById('default');
-			$attributes = $source->lookupUserByAttributeName('labeledURI', $openId);
-			SimpleSAML_Logger::info("LDAP returned:" . var_export($attributes, true));
+			$source = SimpleSAML_Auth_Source::getById($this->source);
+			$attributes = $source->lookupUserByAttributeName($this->attribute, $openId);
 		}
 	}
 

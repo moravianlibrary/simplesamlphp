@@ -1,0 +1,29 @@
+{
+	"login_help": {
+		"cs": "Jak se přihlásit"
+	},
+	"registration": {
+		"cs": "Registrovat"
+	},
+	"login_comment": {
+		"cs": "Po přihlášení budete moci používat online katalog, informační databáze a přidávat komentáře na webu."
+	},
+	"forgotten_login": {
+		"cs": "Neznám číslo/přezdívku"
+	},
+	"password_recovery": {
+		"cs": "Neznám heslo"
+	},
+	"institution_login": {
+		"cs": "Jednotné přihlášení"
+	},
+	"remember_me": {
+		"cs": "Zapamatuj si mě"
+	},
+	"help": {
+		"cs": "nápověda"
+	},
+	"maintenance_in_progress" : {
+		"cs": "Právě probíhá údržba, nemůžete se přihlásit."
+	}
+}
