@@ -125,7 +125,7 @@ if($onLoad !== '') {
 <div id="wrap">
 	
 	<div id="header">
-		<h1><a style="text-decoration: none; color: white" href="/<?php echo $this->data['baseurlpath']; ?>"><?php 
+		<h1><a href="/<?php echo $this->data['baseurlpath']; ?>"><?php
 			echo (isset($this->data['header']) ? $this->data['header'] : 'SimpleSAMLphp');
 		?></a></h1>
 	</div>
@@ -180,6 +180,7 @@ if($onLoad !== '') {
 						'lv' => 'Latviešu', // Latvian
 						'ro' => 'Românește', // Romanian
 						'eu' => 'Euskara', // Basque
+						'af' => 'Afrikaans', // Afrikaans
 			);
 			
 			$textarray = array();

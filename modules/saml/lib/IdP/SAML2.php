@@ -282,6 +282,7 @@ class sspmod_saml_IdP_SAML2 {
 			$consumerIndex = NULL;
 			$extensions = NULL;
 			$allowCreate = TRUE;
+			$authnContext = null;
 
 			$idpInit = TRUE;
 
@@ -317,6 +318,7 @@ class sspmod_saml_IdP_SAML2 {
 			$protocolBinding = $request->getProtocolBinding();
 			$consumerIndex = $request->getAssertionConsumerServiceIndex();
 			$extensions = $request->getExtensions();
+			$authnContext = $request->getRequestedAuthnContext();
 
 			$nameIdPolicy = $request->getNameIdPolicy();
 			if (isset($nameIdPolicy['Format'])) {
@@ -384,6 +386,7 @@ class sspmod_saml_IdP_SAML2 {
 			'saml:AllowCreate' => $allowCreate,
 			'saml:Extensions' => $extensions,
 			'saml:AuthnRequestReceivedAt' => microtime(TRUE),
+			'saml:RequestedAuthnContext' => $authnContext,
 		);
 
 		$idp->handleAuthenticationRequest($state);
@@ -698,12 +701,17 @@ class sspmod_saml_IdP_SAML2 {
                     continue;
                 }
 
+				$attrval = $value;
+				if ($value instanceof DOMNodeList) {
+					$attrval = new \SAML2\XML\saml\AttributeValue($value->item(0)->parentNode);
+				}
+
 				switch ($encoding) {
 				case 'string':
-					$value = (string)$value;
+					$value = (string)$attrval;
 					break;
 				case 'base64':
-					$value = base64_encode((string)$value);
+					$value = base64_encode((string)$attrval);
 					break;
 				case 'raw':
 					if (is_string($value)) {
