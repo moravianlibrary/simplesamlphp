@@ -15,7 +15,7 @@ $this->includeAtTemplateBase('includes/header.php');
 	}
         $reg_link = 'https://www.mzk.cz/registration_mzk';
 	$error = false;
-	$content = trim(file_get_contents("/usr/local/simplesamlphp/maintenance.txt"));
+	$content = trim(file_get_contents("/opt/shibboleth/simplesamlphp/config/maintenance.txt"));
 	if ($content != "") {
 		$error = true;
 		$error_str = "{login:maintenance_in_progress}";
