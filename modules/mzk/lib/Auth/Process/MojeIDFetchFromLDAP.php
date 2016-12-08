@@ -30,6 +30,11 @@ class sspmod_mzk_Auth_Process_mojeIDFetchFromLDAP extends SimpleSAML_Auth_Proces
 			$openId = $attributes['openid.local_id'][0];
 			$source = SimpleSAML_Auth_Source::getById($this->source);
 			$attributes = $source->lookupUserByAttributeName($this->attribute, $openId);
+			if (empty($attributes)) {
+				$id  = SimpleSAML_Auth_State::saveState($request, 'mzk:request');
+				$url = SimpleSAML\Module::getModuleURL('mzk/mojeid_missing.php');
+				\SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
+			}
 		}
 	}
 

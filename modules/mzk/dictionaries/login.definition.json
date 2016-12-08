@@ -25,5 +25,11 @@
 	},
 	"maintenance_in_progress" : {
 		"en": "You can't login at this time. Maintenance in progress."
-	}
+	},
+	"mojeid_missing_header" : {
+		"en": "Your library account is not connected with MojeID"
+	},
+	"mojeid_missing_link_text" : {
+                "en": "Connect your library account with MojeID here"
+        }
 }
