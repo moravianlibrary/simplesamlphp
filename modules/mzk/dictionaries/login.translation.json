@@ -25,5 +25,11 @@
 	},
 	"maintenance_in_progress" : {
 		"cs": "Právě probíhá údržba, nemůžete se přihlásit."
+	},
+	"mojeid_missing_header" : {
+		"cs": "Nemáte propojený knihovní účet s MojeID"
+	},
+	"mojeid_missing_link_text" : {
+		"cs": "Propojte si zde svůj knihovní účet s MojeID"
 	}
 }
