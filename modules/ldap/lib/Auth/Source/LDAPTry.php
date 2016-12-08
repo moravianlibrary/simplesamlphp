@@ -70,6 +70,15 @@ class sspmod_ldap_Auth_Source_LDAPTry extends sspmod_core_Auth_UserPassBase {
 				return $result;
 			} catch (Exception $ex) {}
 		}
+		$password = strtolower($password);
+		foreach($this->servers as $server) {
+			try {
+                                $result = $server["server"]->login($username, $password, $sasl_args);
+                                $result['id'] = $result[$server["id"]];
+                                $result['source'] = $server["source"];
+                                return $result;
+                        } catch (Exception $ex) {}
+                }
 		throw new SimpleSAML_Error_Error('WRONGUSERPASS');
 	}
 
