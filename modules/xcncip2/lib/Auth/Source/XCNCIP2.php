@@ -15,6 +15,8 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 
 	protected $fromAgencyId;
 
+	protected $needsUsername;
+
 	protected $organizationName;
 
 	public function __construct($info, &$config) {
@@ -40,6 +42,8 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 		$this->toAgencyId = $config['toAgencyId'];
 		$this->fromAgencyId = $config['fromAgencyId'];
 		$this->organizationName = $config['organizationName'];
+
+		$this->needsUsername = isset($config['needsUsername']) ? $config['needsUsername'] : false;
 
 		$this->excludeAcademicDegrees = isset($config['excludeAcademicDegrees']) ? $config['excludeAcademicDegrees'] : false;
 	}
@@ -143,7 +147,8 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 				$providedAttributes['mail'] = array( $mail );
 
 			$isEmployee = false;
-			if ($privilegeType === 'S') {
+			// Note that this is only applyable for Koha
+			if ($privilegeType === 'KN' || $privilegeType === 'S') {
 				$providedAttributes['eduPersonScopedAffiliation'][] = 'employee@' . $this->eppnScope;
 				$providedAttributes['eduPersonScopedAffiliation'][] = 'staff@' . $this->eppnScope;
 				$isEmployee = true;
@@ -234,7 +239,7 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 			'text/plain' .
 			'</ns1:AuthenticationDataFormatType>' .
 			'<ns1:AuthenticationInputType>' .
-			'User Id' .
+			( $this->needsUsername ? 'Username' : 'User Id') .
 			'</ns1:AuthenticationInputType>' .
 			'</ns1:AuthenticationInput>' .
 			'<ns1:AuthenticationInput>' .
