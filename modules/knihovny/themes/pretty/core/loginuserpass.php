@@ -3,9 +3,8 @@
 <head>
 	<title><?php echo $this->t('{login:user_pass_header}'); ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<!--	<meta http-equiv="x-xrds-location" content="<?php echo SimpleSAML_Module::getModuleURL('xcncip2/xrds.xml'); ?>" /> -->
 
-	<link rel='stylesheet' href="<?php echo SimpleSAML_Module::getModuleURL('xcncip2/global.css?v0'); ?>" type='text/css' />
+	<link rel='stylesheet' href="<?php echo SimpleSAML_Module::getModuleURL('knihovny/global.css?v0'); ?>" type='text/css' />
 	<!--[if IE]><style type="text/css">#login h1 a { margin-top: 35px; } #login #login_error { margin-bottom: 10px; }</style><![endif]--><!-- Curse you, IE! -->
 
 	<script type="text/javascript">
@@ -30,30 +29,18 @@
              $current_lang = $lang;
          }
     } 
-    // if ($_GET['language'] == 'en') {
     if ($current_lang == 'en') {
         $switch_lang = 'cs';
-        //$remember_me = "Remember me";
-        //$password_forgot = "Forgot your password?";
-        //$institution_login = "Institution login";
     } else {
         $switch_lang = 'en';
-        //$remember_me = "Zapamatuj si mě";
-        //$password_forgot = "Zapomněli jste heslo?";
-        //$institution_login = "Jednotné přihlášení";
     }
     $params = array('language' => $switch_lang);
     foreach ($this->data['stateparams'] as $name => $value) {
         $params[$name] = $value;
     }
-    // $href = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), array('language' => $switch_lang)));
     $href = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), $params));
     $img = SimpleSAML_Module::getModuleURL('xcncip2/'.$switch_lang.'.gif');
-    //$lang = "<a href='$href'> <img src='$img' /> </a>";
     $lang = "<a href='$href'> <img align='right' src='$img'/> </a>";
-    /* $login_str = $this->t('{login:username}') . "&nbsp;<a href='http://www.mzk.cz/sluzby/navody/jak-se-prihlasit-do-katalogu'" 
-       ."target='_blank' style='text-decoration: none;'>(" . $this->t('{login:help}') . ")</a>"; Nápověda link */
-
     $login_str = ($current_lang == 'en')?"Username":"Uživatelské jméno";
 
     $error = false;
@@ -72,7 +59,7 @@
 		
 		<form name="loginform" id="loginform" action="?" method="post">			
 				<p>
-					<img src="<?php echo SimpleSAML_Module::getModuleURL('xcncip2/logo.png'); ?>" height="40" align="bottom" alt="logo"/>
+					<img src="<?php echo SimpleSAML_Module::getModuleURL('knihovny/logo.png'); ?>" height="40" align="bottom" alt="logo"/>
 					<span align='right'><?php echo $lang; ?></span>
 				</p>
 				<!-- <p><?php echo $lang ?></p> -->
@@ -112,18 +99,6 @@
 			<h2><?php echo $this->t('{login:error_header}'); ?></h2>
 			<p style="clear: both"><b><?php echo $this->t('{errors:title_' . $this->data['errorcode'] . '}'); ?></b></p>
 			<p><?php echo $this->t('{errors:descr_' . $this->data['errorcode'] . '}'); ?></p>
-			<!--
-			<table>
-			<tr>
-			<td>
-			<p class="cervene_pozadi"> 
-				<a href="http://aleph.mzk.cz/cgi-bin/login_recovery.pl" style="text-decoration: none;"><?php echo $this->t('{login:forgotten_login}'); ?></a></p>
-			</td><td><p class="cervene_pozadi">
-				<a href="https://aleph.mzk.cz/cgi-bin/password_recovery.pl" style="text-decoration: none;"><?php echo $this->t('{login:password_recovery}'); ?></a></p>
-				</td> 
-			</tr>                  
-					</table>
-			-->
 		</div>
 	<?php
 	}
@@ -139,7 +114,6 @@
 				<?php endif; ?>
 			</div>
 		<?php endif; ?>
-			<!--</div>-->
 	</div>
 
 			<div class="login-footer">
@@ -159,26 +133,6 @@
 
 
 	?>
-	<!-- 
-		<?php if (isset($this->data['error'])) { ?>
-			<div id="error">
-			<img src="/<?php echo $this->data['baseurlpath']; ?>resources/icons/experience/gtk-dialog-error.48x48.png" style="float: left; margin: 15px " />
-			<h2><?php echo $this->t('{error:error_header}'); ?></h2>
-			
-			<p style="padding: .2em"><?php echo $this->t($this->data['error']); ?> </p>fdajflajdlfjaldfsjla
-			<table>
-			<tr>
-			<td>
-			<p class="cervene_pozadi"> 
-				<a href="http://aleph.mzk.cz/cgi-bin/login_recovery.pl" style="text-decoration: none;">Neznám číslo nebo přezdívku</a></p>
-			</td><td><p class="cervene_pozadi">
-				<a href="https://aleph.mzk.cz/cgi-bin/password_recovery.pl" style="text-decoration: none;">Neznám heslo</a></p>
-				</td> 
-			</tr>                  
-					</table>  
-			</div>
-		<?php } ?>
-	 -->	
 	<?php
 	foreach ($this->data['stateparams'] as $name => $value) {
 		echo('<input type="hidden" name="' . htmlspecialchars($name) . '" value="' . htmlspecialchars($value) . '" />');
@@ -188,51 +142,5 @@
 		</form>
 	</div>
 </div>
-
-
-<?php
-/*
-
-	$includeLanguageBar = TRUE;
-	if (!empty($_POST)) 
-		$includeLanguageBar = FALSE;
-	if (isset($this->data['hideLanguageBar']) && $this->data['hideLanguageBar'] === TRUE) 
-		$includeLanguageBar = FALSE;
-	
-	if ($includeLanguageBar) {
-		
-
-		echo '<div id="languagebar">';		
-		
-		// echo '<form action="' . SimpleSAML_Utilities::selfURL() . '" method="get">';
-		// echo '<select name="language">';
-		// echo '</select>';
-		// echo '</form>';
-		
-		$languages = $this->getLanguageList();
-		$langnames = array(
-			'en' => 'English',
-			'de' => 'Deutsch', 
-			'cs' => 'Czech',
-		);
-		
-		$textarray = array();
-		foreach ($languages AS $lang => $current) {
-			if ($current) {
-				$textarray[] = $langnames[$lang];
-			} else {
-				$textarray[] = '<a href="' . htmlspecialchars(
-						SimpleSAML_Utilities::addURLparameter(
-							SimpleSAML_Utilities::selfURL(), array('language' => $lang)
-						)
-				) . '">' . $langnames[$lang] . '</a>';
-			}
-		}
-		echo join(' | ', $textarray);
-		echo '</div>';
-	}
-*/
-?>
-
 </body>
 </html>
