@@ -62,8 +62,7 @@
 					<img src="<?php echo SimpleSAML_Module::getModuleURL('knihovny/logo.png'); ?>" height="40" align="bottom" alt="logo"/>
 					<span align='right'><?php echo $lang; ?></span>
 				</p>
-				<!-- <p><?php echo $lang ?></p> -->
-				<p><h1><?php echo $this->t('{login:institution_login}'); ?></h1></p>
+				<p><h1><?php echo $this->t('{knihovny:login:institution_login}'); ?></h1></p>
                                 <?php if($error) {
                                 ?>
                                 <p style="color:#EF406B;">
@@ -117,7 +116,7 @@
 	</div>
 
 			<div class="login-footer">
-				<p><?php echo $this->t('{login:login_comment}'); ?></p>
+				<p><?php echo $this->t('{knihovny:login:login_comment}'); ?></p>
 			</div>
                         <?php } ?>			
 
