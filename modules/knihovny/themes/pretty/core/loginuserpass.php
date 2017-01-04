@@ -39,7 +39,7 @@
         $params[$name] = $value;
     }
     $href = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), $params));
-    $img = SimpleSAML_Module::getModuleURL('xcncip2/'.$switch_lang.'.gif');
+    $img = SimpleSAML_Module::getModuleURL('knihovny/'.$switch_lang.'.gif');
     $lang = "<a href='$href'> <img align='right' src='$img'/> </a>";
     $login_str = ($current_lang == 'en')?"Username":"Uživatelské jméno";
 
