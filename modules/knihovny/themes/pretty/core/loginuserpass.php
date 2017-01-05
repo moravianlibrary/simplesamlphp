@@ -49,8 +49,6 @@
        $error = true;
        $error_str = "{login:maintenance_in_progress}"; // "You can't login at this time. Maintenance in progress.";
     }
-    $state = SimpleSAML_Auth_State::loadState($_GET['AuthState'], 'sspmod_core_Auth_UserPassBase.state');
-    $source = $state['IdPMetadata']['auth'];
 ?>
 
 <div class="container">
@@ -61,7 +59,7 @@
 		
 		<form name="loginform" id="loginform" action="?" method="post">			
 				<p>
-					<img src="<?php echo SimpleSAML_Module::getModuleURL('knihovny/' . $source . '.png'); ?>" height="40" align="bottom" alt="logo"/>
+					<img src="/logo.png" height="40" align="bottom" alt="logo"/>
 					<span align='right'><?php echo $lang; ?></span>
 				</p>
 				<p><h1><?php echo $this->t('{knihovny:login:institution_login}'); ?></h1></p>
