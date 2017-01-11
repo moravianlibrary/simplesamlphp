@@ -50,7 +50,7 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 
 	public function login($username, $password) {
 		$requestBody = $this->getLookupUserRequest($username, $password);
-		$response = $this->doRequest($requestBody);
+		$response = $this->doRequest($requestBody, $username);
 		$id = $response->xpath(
 				'ns1:LookupUserResponse/ns1:UserId/ns1:UserIdentifierValue'
 				);
@@ -178,7 +178,7 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 
 	}
 
-	protected function doRequest($body) {
+	protected function doRequest($body, $username) {
 		$req = curl_init($this->url);
 		curl_setopt($req, CURLOPT_POST, 1);
 		curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
@@ -198,7 +198,11 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 				curl_setopt($req, CURLOPT_CAINFO, $this->certificateAuthority);
 		}
 
+		// Do not log the real NCIP request body, it contains private credentials!!!!
+		SimpleSAML_Logger::info("NCIP request sent to $this->url: ". $this->getLookupUserRequest($username, "********")); 
+
 		$response = curl_exec($req);
+		SimpleSAML_Logger::info("NCIP response: ". $response);
 		$result = simplexml_load_string($response);
 
 		if (is_a($result, 'SimpleXMLElement')) {
