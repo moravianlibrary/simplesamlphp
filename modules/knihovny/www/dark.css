@@ -1,6 +1,6 @@
 body {
 	font-family: 'Lucida Grande', arial, sans-serif;
-	background: #F5F5F5;	
+	background: #F5F5F5;
 	color: white;
 	font-size: 15px;
 	margin: 0;
@@ -9,8 +9,7 @@ body {
 h1 { color: #000; }
 p { line-height: 20px; margin: 0 0 10px 0; }
 hr { color: #e0e0e0; height: 1px; display: block; border: none; border-top: 1px solid #e0e0e0; }
-/* a { color: #0C696E; text-decoration: underline !important;*/ } */
-a { color: white; text-decoration: /*underline !important;*/ }
+a { color: white; }
 a:hover { text-decoration: none !important; }
 img { border: 0px; }
 
@@ -27,7 +26,7 @@ img { border: 0px; }
 	padding: 0 1em 0 1em;
 }
 
-#login input.input { 
+#login input.input {
 	font-family: arial, sans-serif;
 	width: 200px;
 	font-size: 15px;
@@ -87,15 +86,15 @@ a.register {
 	color: white;
 	font-weight: bold;
 	font-family: arial, sans-serif;
-        font-size: 15px;
-	text-decoration: none; 
-}
-
-a.register:link { 
+	font-size: 15px;
 	text-decoration: none;
 }
 
-a.register:active { 
+a.register:link {
+	text-decoration: none;
+}
+
+a.register:active {
 	text-decoration: none;
 }
 
