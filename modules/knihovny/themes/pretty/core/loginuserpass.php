@@ -1,10 +1,16 @@
+<?php
+    $theme = 'light';
+    if (isset($_SERVER['SIMPLESAMLPHP_THEME'])) {
+        $theme = $_SERVER['SIMPLESAMLPHP_THEME'];
+    }
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" data-tldr="true">
 <head>
 	<title><?php echo $this->t('{login:user_pass_header}'); ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-	<link rel='stylesheet' href="<?php echo SimpleSAML_Module::getModuleURL('knihovny/global.css?v0'); ?>" type='text/css' />
+	<link rel='stylesheet' href="<?php echo SimpleSAML_Module::getModuleURL('knihovny/'. $theme . '.css?v0'); ?>" type='text/css' />
 	<!--[if IE]><style type="text/css">#login h1 a { margin-top: 35px; } #login #login_error { margin-bottom: 10px; }</style><![endif]--><!-- Curse you, IE! -->
 
 	<script type="text/javascript">
@@ -17,7 +23,6 @@
 <body class="login">
 
 <?php
-
     $loginRecoveryLink = "";
     $passwordRecoveryLink = "";
     $registeryLink = "";
