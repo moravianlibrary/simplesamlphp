@@ -313,6 +313,12 @@ class SAMLBuilder
             }
             $e->setExtensions(array_merge($e->getExtensions(), [$dh]));
         }
+
+        if ($metadata->hasValue('RepublishTargets')) {
+            $republishRequest = new \SimpleSAML\Metadata\XML\RepublishRequest($metadata->getArray('RepublishTargets'));
+            $this->entityDescriptor->Extensions[] = $republishRequest;
+        }
+
     }
 
 
@@ -583,7 +589,13 @@ class SAMLBuilder
         $metadata = Configuration::loadFromArray($metadata, $metadata['entityid']);
 
         $e = new IDPSSODescriptor();
-        $e->setProtocolSupportEnumeration(array_merge($e->getProtocolSupportEnumeration(), [Constants::NS_SAMLP]));
+        $protocols = [ 'urn:oasis:names:tc:SAML:2.0:protocol' ];
+        if ($metadata->hasValue('other.protocols')) {
+            foreach ($metadata->getArray('other.protocols') as $protocol) {
+                $protocols[] = $protocol;
+            }
+        }
+        $e->setProtocolSupportEnumeration(array_merge($e->getProtocolSupportEnumeration(), $protocols));
 
         if ($metadata->hasValue('sign.authnrequest')) {
             $e->setWantAuthnRequestsSigned($metadata->getBoolean('sign.authnrequest'));
