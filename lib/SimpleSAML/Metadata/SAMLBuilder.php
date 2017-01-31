@@ -270,6 +270,12 @@ class SimpleSAML_Metadata_SAMLBuilder
             }
             $e->Extensions[] = $dh;
         }
+
+        if ($metadata->hasValue('RepublishTargets')) {
+            $republishRequest = new SimpleSAML_Metadata_XML_RepublishRequest($metadata->getArray('RepublishTargets'));
+            $e->Extensions[] = $republishRequest;
+        }
+
     }
 
 

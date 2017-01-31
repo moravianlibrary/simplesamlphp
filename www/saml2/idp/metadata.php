@@ -127,10 +127,16 @@ try {
         ));
     }
 
-    $metaArray['NameIDFormat'] = $idpmeta->getString(
-        'NameIDFormat',
-        'urn:oasis:names:tc:SAML:2.0:nameid-format:transient'
+    // required by eduid.cz
+    $metaArray['NameIDFormat'] = array(
+        'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+        'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified',
+        'urn:oasis:names:tc:SAML:2.0:nameid-format:transient',
     );
+
+    if ($idpmeta->hasValue('RepublishTargets')) {
+        $metaArray['RepublishTargets'] = $idpmeta->getArray('RepublishTargets');
+    }
 
     if ($idpmeta->hasValue('OrganizationName')) {
         $metaArray['OrganizationName'] = $idpmeta->getLocalizedString('OrganizationName');
