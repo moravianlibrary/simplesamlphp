@@ -33,6 +33,10 @@ class sspmod_mzk_Auth_Process_AffilationFilterLDAP extends SimpleSAML_Auth_Proce
 			$attributes["eduPersonAffiliation"][] = "member";
 			$attributes["eduPersonScopedAffiliation"][] = "member@mzk.cz";
 			$attributes["uid"] = $attributes["id"];
+			$attributes["mzkPermission"][] = "wifi";
+		}
+		if (in_array('mzkWifiAccount', $attributes['objectClass'])) {
+			$attributes["mzkPermission"][] = "wifi";
 		}
 		if (in_array('mzkProxyAccount', $attributes['objectClass'])) {
 			$attributes["eduPersonAffiliation"][] = "member";
