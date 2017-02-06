@@ -2,12 +2,8 @@
 	<XRD>
 		<Service>
 			<Type>http://specs.openid.net/auth/2.0/return_to</Type>
-			<URI>https://shibboleth.mzk.cz/simplesaml/module.php/mojeid/consumer.php</URI>
+			<URI>https://shibboleth.mzk.cz/simplesaml/module.php/openid/linkback.php</URI>
 		</Service>
-		<Service>
-                        <Type>http://specs.openid.net/auth/2.0/return_to</Type>
-                        <URI>https://shibboleth.mzk.cz/simplesaml/module.php/openid/consumer.php</URI>
-                </Service>
 		<Service>
 			<Type>http://specs.nic.cz/registration/assert_url</Type>
 			<URI>https://registrace.mzk.cz/mojeid-reg/</URI>
