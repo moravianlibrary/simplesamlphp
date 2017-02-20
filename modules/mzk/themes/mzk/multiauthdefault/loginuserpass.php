@@ -73,7 +73,7 @@ $this->includeAtTemplateBase('includes/header.php');
 				$params['source'] = 'mojeid';
 				$href = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), $params));
 			?>
-			<a href="<?php echo $href?>"><img src="https://registrace.mzk.cz/images/mojeid.png"></img></a>
+			<a href="<?php echo $href?>"><img src="<?=SimpleSAML_Module::getModuleURL('mzk/mojeid.png');?>"></img></a>
 		</div>
 
 		<div class="login-footer">
