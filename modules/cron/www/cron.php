@@ -17,6 +17,8 @@ if (!is_null($cronconfig->getValue('allowed_tags'))) {
 }
 
 
+ini_set('memory_limit','512M');
+
 $summary = array(); 
 $croninfo = array(
 	'summary' => &$summary,
