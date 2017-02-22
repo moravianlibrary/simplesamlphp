@@ -7,6 +7,9 @@ $this->includeAtTemplateBase('includes/header.php');
 ?>
 
 <?php
+	$config = SimpleSAML_Configuration::getConfig('authsources.php')->toArray();
+	#SimpleSAML_Logger::info("Config loaded: " . var_export($config, true));
+
 	$employee = ($_SERVER['REMOTE_ADDR'] == "195.113.155.2");
 	$login_str = $this->t('{login:username}') . "&nbsp;<a href='http://www.mzk.cz/sluzby/navody/jak-se-prihlasit-do-katalogu'" 
 		."target='_blank' style='text-decoration: none;'>(" . $this->t('{mzk:login:login_help}') . ")</a>";
@@ -47,6 +50,20 @@ $this->includeAtTemplateBase('includes/header.php');
 			<div class="login-btn">
 				<input class="btn" type="submit" name="wp-submit" id="wp-submit" value="<?php echo $this->t('{login:login_button}'); ?> &raquo;" tabindex="100" />
 					<a class="btn" href="<?php echo $reg_link; ?>" title="Nejste v MZK zaregistrovaní? Přejděte na online předregistraci"><?php echo $this->t('{mzk:login:registration}'); ?>&nbsp;&raquo;</a>
+			<?php
+				$isWalkIn = FALSE;
+				if (isset($config['walkin']) && isset($config['walkin']['libraryCIDRs']) ) {
+					$isWalkIn = sspmod_walkin_Auth_Source_LibraryWalkIn::user_cidr_match($config['walkin']['libraryCIDRs']);
+				}
+				if ($isWalkIn) {
+					foreach ($this->data['stateparams'] as $name => $value) {
+						$params[$name] = $value;
+					}
+					$params['source'] = 'walkin';
+					$walkinHref = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), $params));
+			?>
+				<a class="btn" href="<?php echo $walkinHref; ?>" title="Právě se nacházíte v knihovně, můžete tedy využít účet hosta"><?php echo $this->t('{mzk:login:walkin}'); ?>&nbsp;&raquo;</a>
+			<?php 	} ?>
 			</div>
 
 			<?php if ($this->data['errorcode'] !== NULL) { ?>

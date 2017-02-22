@@ -31,5 +31,20 @@
 	},
 	"mojeid_missing_link_text" : {
 		"cs": "Propojte si zde svůj knihovní účet s MojeID"
+	},
+	"walkin" : {
+		"cs": "Přihlásit jako host"
+	},
+	"may_close_window" : {
+                "cs": "Nyní můžete zavřít toto okno."
+        },
+	"walkin_outside_library" : {
+		"cs": "Účet hosta lze použít jen v knihovně"
+        },
+	"walkin_outside_please_return" : {
+		"cs": "Prosím, vraťte se zpět do internetové sítě knihovny nebo se přihlašte pod svým účtem."
+        },
+	"walkin_logged_out" : {
+		"cs": "Byli jste odhlášeni z účtu hosta, neboť se právě nenacházíte v internetové síti knihovny."
 	}
 }
