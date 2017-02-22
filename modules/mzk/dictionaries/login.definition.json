@@ -31,5 +31,20 @@
 	},
 	"mojeid_missing_link_text" : {
                 "en": "Connect your library account with MojeID here"
-        }
+	},
+	"may_close_window" : {
+                "en": "You may now close this window."
+	},
+	"walkin" : {
+                "en": "Login as a guest"
+        },
+	"walkin_outside_library" : {
+		"en": "Cannot use guest account outside the library"
+        },
+	"walkin_outside_please_return" : {
+		"en": "Please return to the library network or log in using your library account."
+        },
+	"walkin_logged_out" : {
+		"en": "You have been logged out of the guest account because you are no longer inside the library network."
+	}
 }

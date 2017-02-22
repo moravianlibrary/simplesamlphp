@@ -8,6 +8,7 @@
 	}
 	$switch_lang = ($current_lang == 'en') ? 'cs' : 'en';
 	$params = array('language' => $switch_lang);
+	if (array_key_exists('stateparams', $this->data))
 	foreach ($this->data['stateparams'] as $name => $value) {
 		$params[$name] = $value;
 	}
@@ -46,7 +47,9 @@
 		<div class="login-header"></div>
 		<div id="login">
 			<p>
-				<img src="https://www.mzk.cz/sites/mzk.cz/themes/mzk/logo.png" height="40" align="bottom" alt="logo"/>
+				<a href="https://www.mzk.cz/">
+					<img src="https://www.mzk.cz/sites/mzk.cz/themes/mzk/logo.png" height="40" align="bottom" alt="logo"/>
+				</a>
 				<span align='right'><?php echo $lang; ?></span>
 			</p>
 			<p>
