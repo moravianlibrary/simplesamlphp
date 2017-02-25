@@ -3,9 +3,9 @@
 class sspmod_walkin_Auth_Process_RevalidateLibraryWalkIn extends SimpleSAML_Auth_ProcessingFilter {
 
 	/**
-	 * Array of CIDRs defining library's network for walk-in users
+	 * Authsources configuration .. 
 	 */
-	private $libraryCIDRs;
+	private $authsourcesConfig;
 
 
 	/**
@@ -17,19 +17,12 @@ class sspmod_walkin_Auth_Process_RevalidateLibraryWalkIn extends SimpleSAML_Auth
 	public function __construct($config, $reserved) {
 		parent::__construct($config, $reserved);
 
+		$this->authsourcesConfig = SimpleSAML_Configuration::getConfig('authsources.php')->toArray();
 
-		$config = SimpleSAML_Configuration::getConfig('authsources.php')->toArray();
-
-		if (isset($config['walkin']) && isset($config['walkin']['libraryCIDRs']) ) {
-			$this->libraryCIDRs = $config['walkin']['libraryCIDRs'];
-		}
-
-		if ($this->libraryCIDRs === NULL)
-			throw new SimpleSAML_Error_Exception('Missing libraryCIDRs array for library walkin');
 	}
 
 
-	/**
+	/*
 	 * Check user really is walkin.
 	 *
 	 * This filter is here because user could have tried to use his cookie to reauthenticate outside of the library
@@ -38,9 +31,18 @@ class sspmod_walkin_Auth_Process_RevalidateLibraryWalkIn extends SimpleSAML_Auth
 	 */
 	public function process(&$request) {
 
-		$isWalkIn = sspmod_walkin_Auth_Source_LibraryWalkIn::user_cidr_match($this->libraryCIDRs);
+		if (isset($request['IdPMetadata']) && isset($request['IdPMetadata']['auth']))
+			/* 
+			 * TODO: We should check if this AuthId is multiauth .. and if it is, our goal is to find authId
+			 * of used walkin IdP instead of hardcoded 'walkin' - it doesn't have to be named like that
+			 */
+			$authId = $request['IdPMetadata']['auth'];
 
-		if ($isWalkIn === FALSE) {
+		$authId = 'walkin';
+
+		$canBeWalkIn = sspmod_walkin_Auth_Source_LibraryWalkIn::canBeWalkIn($this->authsourcesConfig[$authId], $request);
+
+		if ($canBeWalkIn === FALSE) {
 			$id  = SimpleSAML_Auth_State::saveState($request, 'mzk:outside_library');
 			$url = SimpleSAML\Module::getModuleURL('mzk/outside_library.php');
 			\SimpleSAML\Utils\HTTP::redirectTrustedURL($url, array('StateId' => $id));
