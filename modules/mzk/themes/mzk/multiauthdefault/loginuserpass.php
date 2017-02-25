@@ -8,7 +8,11 @@ $this->includeAtTemplateBase('includes/header.php');
 
 <?php
 	$config = SimpleSAML_Configuration::getConfig('authsources.php')->toArray();
+
+	$walkinAuthId = 'walkin';
+
 	#SimpleSAML_Logger::info("Config loaded: " . var_export($config, true));
+	#SimpleSAML_Logger::info(var_export($this->data, true));
 
 	$employee = ($_SERVER['REMOTE_ADDR'] == "195.113.155.2");
 	$login_str = $this->t('{login:username}') . "&nbsp;<a href='http://www.mzk.cz/sluzby/navody/jak-se-prihlasit-do-katalogu'" 
@@ -51,11 +55,8 @@ $this->includeAtTemplateBase('includes/header.php');
 				<input class="btn" type="submit" name="wp-submit" id="wp-submit" value="<?php echo $this->t('{login:login_button}'); ?> &raquo;" tabindex="100" />
 					<a class="btn" href="<?php echo $reg_link; ?>" title="Nejste v MZK zaregistrovaní? Přejděte na online předregistraci"><?php echo $this->t('{mzk:login:registration}'); ?>&nbsp;&raquo;</a>
 			<?php
-				$isWalkIn = FALSE;
-				if (isset($config['walkin']) && isset($config['walkin']['libraryCIDRs']) ) {
-					$isWalkIn = sspmod_walkin_Auth_Source_LibraryWalkIn::user_cidr_match($config['walkin']['libraryCIDRs']);
-				}
-				if ($isWalkIn) {
+				$canBeWalkIn = sspmod_walkin_Auth_Source_LibraryWalkIn::canBeWalkIn($config[$walkinAuthId], $this->data);
+				if ($canBeWalkIn) {
 					foreach ($this->data['stateparams'] as $name => $value) {
 						$params[$name] = $value;
 					}
