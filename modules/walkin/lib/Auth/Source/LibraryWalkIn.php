@@ -96,26 +96,20 @@ class sspmod_walkin_Auth_Source_LibraryWalkIn extends SimpleSAML_Auth_Source {
 		}
 
 		if ($thisInstance !== null) {
-
 			# We have already parsed the configuration while initializing this class ..
 			$libraryCIDRs = $thisInstance->libraryCIDRs;
 			$allowedEntityIds = $thisInstance->allowedEntityIds;
-
 		} else if (isset($config)) {
-
 			# Check that we have gained mandatory configuration vars
-			if (! isset($config['libraryCIDRs']) || ! isset($config['allowedEntityIds']) || ! is_array($config['allowedEntityIds']))
-
+			if (! isset($config['libraryCIDRs']) || ! isset($config['allowedEntityIds']) || ! is_array($config['allowedEntityIds'])) {
 				# Cannot be walkin without proper configuration
 				return FALSE;
-
+			}
 			$libraryCIDRs = $config['libraryCIDRs'];
 			$allowedEntityIds = $config['allowedEntityIds'];
-
 		} else {
-
-			throw new \Exception('You must provide either $config or $thisInstance!');
-
+			SimpleSAML_Logger::info('Neither $config or $thisInstance provided, disabling LibraryWalkIn.');
+			return false;
 		}
 
 		# Check that user's IP matches defined library CIDR
