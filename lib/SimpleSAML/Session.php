@@ -353,7 +353,7 @@ class SimpleSAML_Session implements Serializable
                     SimpleSAML\Logger::warning('Missing AuthToken cookie.');
                     return null;
                 }
-                if ($_COOKIE[$authTokenCookieName] !== $session->authToken) {
+                if (!SimpleSAML\Utils\Crypto::secureCompare($session->authToken, $_COOKIE[$authTokenCookieName])) {
                     SimpleSAML\Logger::warning('Invalid AuthToken cookie.');
                     return null;
                 }
@@ -704,14 +704,13 @@ class SimpleSAML_Session implements Serializable
             return;
         }
         foreach ($this->authData[$authority]['LogoutHandlers'] as $handler) {
-
             // verify that the logout handler is a valid function
             if (!is_callable($handler)) {
                 $classname = $handler[0];
                 $functionname = $handler[1];
 
                 throw new Exception(
-                    'Logout handler is not a vaild function: '.$classname.'::'.
+                    'Logout handler is not a valid function: '.$classname.'::'.
                     $functionname
                 );
             }

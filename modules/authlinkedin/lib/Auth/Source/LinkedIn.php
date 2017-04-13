@@ -22,6 +22,7 @@ class sspmod_authlinkedin_Auth_Source_LinkedIn extends SimpleSAML_Auth_Source {
 
 	private $key;
 	private $secret;
+	private $attributes;
 
 
 	/**
@@ -46,6 +47,13 @@ class sspmod_authlinkedin_Auth_Source_LinkedIn extends SimpleSAML_Auth_Source {
 			throw new Exception('LinkedIn authentication source is not properly configured: missing [secret]');
 
 		$this->secret = $config['secret'];
+
+		if (array_key_exists('attributes', $config)) {
+			$this->attributes = $config['attributes'];
+		} else {
+			// Default values if the attributes are not set in config (ref https://developer.linkedin.com/docs/fields)
+			$this->attributes = 'id,first-name,last-name,headline,summary,specialties,picture-url,email-address';
+		}
 	}
 
 
@@ -97,15 +105,9 @@ class sspmod_authlinkedin_Auth_Source_LinkedIn extends SimpleSAML_Auth_Source {
 		SimpleSAML\Logger::debug("Got an access token from the OAuth service provider [" .
 			$accessToken->key . "] with the secret [" . $accessToken->secret . "]");
 
-		// TODO: configure attributes (http://developer.linkedin.com/docs/DOC-1061) from config? Limited options via LinkedIn
-		$userdata = $consumer->getUserInfo('https://api.linkedin.com/v1/people/~:(id,first-name,last-name,headline,summary,specialties,picture-url)', $accessToken, array('http' => array('header' => 'x-li-format: json')));
+		$userdata = $consumer->getUserInfo('https://api.linkedin.com/v1/people/~:(' . $this->attributes . ')', $accessToken, array('http' => array('header' => 'x-li-format: json')));
 
-		$attributes = array();
-		foreach($userdata AS $key => $value) {
-			if (is_string($value))
-				$attributes['linkedin.' . $key] = array((string)$value);
-
-		}
+        $attributes = $this->flatten($userdata, 'linkedin.');
 
 		// TODO: pass accessToken: key, secret + expiry as attributes?
 
@@ -118,4 +120,43 @@ class sspmod_authlinkedin_Auth_Source_LinkedIn extends SimpleSAML_Auth_Source {
 
 		$state['Attributes'] = $attributes;
 	}
+
+    /**
+     * takes an associative array, traverses it and returns the keys concatenated with a dot
+     *
+     * e.g.:
+     *
+     * [
+     *   'linkedin' => [
+     *     'location' =>  [
+     *       'id' => '123456'
+     *       'country' => [
+     *          'code' => 'de'
+     *       ]
+     *   ]
+     * ]
+     *
+     * become:
+     *
+     * [
+     *   'linkedin.location.id' => [0 => '123456'],
+     *   'linkedin.location.country.code' => [0 => 'de']
+     * ]
+     *
+     * @param array $array
+     * @param string $prefix
+     *
+     * @return array the array with the new concatenated keys
+     */
+    protected function flatten($array, $prefix = '') {
+        $result = array();
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result = $result + $this->flatten($value, $prefix . $key . '.');
+            } else {
+                $result[$prefix . $key] = array($value);
+            }
+        }
+        return $result;
+    }
 }

@@ -323,8 +323,15 @@ class HTTP
         // validates the URL's host is among those allowed
         if (is_array($trustedSites)) {
             assert(is_array($trustedSites));
-            preg_match('@^https?://([^/]+)@i', $url, $matches);
-            $hostname = $matches[1];
+            preg_match('@^http(s?)://([^/:]+)((?::\d+)?)@i', $url, $matches);
+            $hostname = $matches[2];
+
+            // allow URLs with standard ports specified (non-standard ports must then be allowed explicitly)
+            if (!empty($matches[3]) &&
+                (($matches[1] === '' && $matches[3] !== ':80') || ($matches[1]) === 's' && $matches[3] !== ':443')
+            ) {
+                $hostname = $hostname.$matches[3];
+            }
 
             $self_host = self::getSelfHostWithNonStandardPort();
 
@@ -367,7 +374,8 @@ class HTTP
      * @param array   $context Extra context options. This parameter is optional.
      * @param boolean $getHeaders Whether to also return response headers. Optional.
      *
-     * @return mixed array if $getHeaders is set, string otherwise
+     * @return string|array An array if $getHeaders is set, containing the data and the headers respectively; string
+     *  otherwise.
      * @throws \InvalidArgumentException If the input parameters are invalid.
      * @throws \SimpleSAML_Error_Exception If the file or URL cannot be retrieved.
      *
