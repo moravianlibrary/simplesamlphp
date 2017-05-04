@@ -3,6 +3,9 @@
 $this->data['header'] = 'OpenID Login';
 $this->data['autofocus'] = 'openid-identifier';
 $this->includeAtTemplateBase('includes/header.php');
+// FIXME: move to configuration
+$maintenance_file = '/opt/shibboleth/simplesamlphp/config/maintenance.txt';
+
 
 ?>
 
@@ -22,7 +25,7 @@ $this->includeAtTemplateBase('includes/header.php');
 	}
         $reg_link = 'https://www.mzk.cz/registration_mzk';
 	$error = false;
-	$content = trim(file_get_contents("/opt/shibboleth/simplesamlphp/config/maintenance.txt"));
+	$content = file_exists($maintenance_file) ? trim(file_get_contents($maintenance_file)) : "";
 	if ($content != "") {
 		$error = true;
 		$error_str = "{login:maintenance_in_progress}";
@@ -55,7 +58,10 @@ $this->includeAtTemplateBase('includes/header.php');
 				<input class="btn" type="submit" name="wp-submit" id="wp-submit" value="<?php echo $this->t('{login:login_button}'); ?> &raquo;" tabindex="100" />
 					<a class="btn" href="<?php echo $reg_link; ?>" title="Nejste v MZK zaregistrovaní? Přejděte na online předregistraci"><?php echo $this->t('{mzk:login:registration}'); ?>&nbsp;&raquo;</a>
 			<?php
-				$canBeWalkIn = sspmod_walkin_Auth_Source_LibraryWalkIn::canBeWalkIn($config[$walkinAuthId], $this->data);
+				$canBeWalkIn = false;
+				if (isset($config[$walkinAuthId])) {
+					$canBeWalkIn = sspmod_walkin_Auth_Source_LibraryWalkIn::canBeWalkIn($config[$walkinAuthId], $this->data);
+				}
 				if ($canBeWalkIn) {
 					foreach ($this->data['stateparams'] as $name => $value) {
 						$params[$name] = $value;
