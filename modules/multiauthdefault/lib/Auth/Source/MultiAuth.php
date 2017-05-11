@@ -26,7 +26,7 @@ class sspmod_multiauthdefault_Auth_Source_MultiAuth extends sspmod_multiauth_Aut
 		/* Call the parent constructor first, as required by the interface. */
 		parent::__construct($info, $config);
 	}
-	
+
 	/**
 	 * Prompt the user with a list of authentication sources.
 	 *
@@ -58,7 +58,7 @@ class sspmod_multiauthdefault_Auth_Source_MultiAuth extends sspmod_multiauth_Aut
 		executed */
 		assert('FALSE');
 	}
-	
+
 	public static function handleLogin($authStateId, $username, $password) {
 		assert('is_string($authStateId)');
 		assert('is_string($username)');
@@ -98,7 +98,42 @@ class sspmod_multiauthdefault_Auth_Source_MultiAuth extends sspmod_multiauth_Aut
 		/* Return control to simpleSAMLphp after successful authentication. */
 		SimpleSAML_Auth_Source::completeAuth($state);
 	}
-	
+
+	/**
+	 * Delegate authentication.
+	 *
+	 * This method is called once the user has choosen one authentication
+	 * source. It saves the selected authentication source in the session
+	 * to be able to logout properly. Then it calls the authenticate method
+	 * on such selected authentication source.
+	 *
+	 * @param string $authId	Selected authentication source
+	 * @param array	 $state	 Information about the current authentication.
+	 */
+	public static function delegateAuthentication($authId, $state) {
+		assert('is_string($authId)');
+		assert('is_array($state)');
+
+		$as = SimpleSAML_Auth_Source::getById($authId);
+		if ($as === NULL) {
+			throw new Exception('Invalid authentication source: ' . $authId);
+		}
+
+		/* Save the selected authentication source for the logout process. */
+		$session = SimpleSAML_Session::getSessionFromRequest();
+		$session->setData(self::SESSION_SOURCE, $state[self::AUTHID], $authId);
+
+		try {
+			$as->authenticate($state);
+		} catch (SimpleSAML_Error_Exception $e) {
+			SimpleSAML_Auth_State::throwException($state, $e);
+		} catch (Exception $e) {
+			$e = new SimpleSAML_Error_UnserializableException($e);
+			SimpleSAML_Auth_State::throwException($state, $e);
+		}
+		SimpleSAML_Auth_Source::completeAuth($state);
+	}
+
 	/**
 	 * Log out from this authentication source.
 	 *
@@ -108,18 +143,18 @@ class sspmod_multiauthdefault_Auth_Source_MultiAuth extends sspmod_multiauth_Aut
 	 * @param array &$state	 Information about the current logout operation.
 	 */
 	public function logout(&$state) {
-                assert('is_array($state)');
+		assert('is_array($state)');
 
-                /* Get the source that was used to authenticate */
-                $session = SimpleSAML_Session::getSessionFromRequest();
-                $authId = $session->getData(self::SESSION_SOURCE, $this->authId);
+		/* Get the source that was used to authenticate */
+		$session = SimpleSAML_Session::getSessionFromRequest();
+		$authId = $session->getData(self::SESSION_SOURCE, $this->authId);
 
-                $source = SimpleSAML_Auth_Source::getById(self::DEFAULT_SOURCE_ID);
-                if ($source === NULL) {
-                        throw new Exception('Invalid authentication source during logout: ' . $source);
-                }
-                /* Then, do the logout on it */
-                $source->logout($state);
+		$source = SimpleSAML_Auth_Source::getById(self::DEFAULT_SOURCE_ID);
+		if ($source === NULL) {
+			throw new Exception('Invalid authentication source during logout: ' . $source);
+		}
+		/* Then, do the logout on it */
+		$source->logout($state);
 	}
 
 }

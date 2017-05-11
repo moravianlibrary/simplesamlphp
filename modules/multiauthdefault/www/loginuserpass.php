@@ -21,7 +21,7 @@ $state = SimpleSAML_Auth_State::loadState($authStateId, sspmod_multiauth_Auth_So
 
 if (array_key_exists('source', $_REQUEST)) {
 	$source = $_REQUEST['source'];
-	sspmod_multiauth_Auth_Source_MultiAuth::delegateAuthentication($source, $state);
+	sspmod_multiauthdefault_Auth_Source_MultiAuth::delegateAuthentication($source, $state);
 }
 
 $source = SimpleSAML_Auth_Source::getById(sspmod_multiauthdefault_Auth_Source_MultiAuth::DEFAULT_SOURCE_ID);

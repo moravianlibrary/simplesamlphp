@@ -26,6 +26,7 @@
         "simplesamlphp/saml2": "~1.9.1",
         "robrichards/xmlseclibs": "~1.4.1",
         "whitehat101/apr1-md5": "~1.0",
+        "openid/php-openid": "2.3.0",
         "ext-SPL": "*",
         "ext-zlib": "*",
         "ext-pcre": "*",

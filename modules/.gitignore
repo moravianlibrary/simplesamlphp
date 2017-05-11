@@ -30,6 +30,7 @@
 !/multiauth/
 !/negotiate/
 !/oauth/
+!/openid/
 !/portal/
 !/preprodwarning/
 !/radius/
