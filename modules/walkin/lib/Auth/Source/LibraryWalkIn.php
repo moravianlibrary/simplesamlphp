@@ -10,6 +10,11 @@
  */
 class sspmod_walkin_Auth_Source_LibraryWalkIn extends SimpleSAML_Auth_Source {
 
+    /**
+     * Affiliation to be used when authenticated as walk-in
+     */
+    const LIBRARY_WALK_IN_AFFILIATION = 'library-walk-in';
+
 	/**
 	 * Array of CIDRs defining library's network for walk-in users
 	 */
@@ -50,7 +55,7 @@ class sspmod_walkin_Auth_Source_LibraryWalkIn extends SimpleSAML_Auth_Source {
 		$this->allowedEntityIds = $cfgParse->getArray('allowedEntityIds', array());
 
 		if (empty($this->allowedEntityIds))
-			SimpleSAML_Logger::warning('walkin->allowedEntityIds is empty, no resource can be accessed as walkin');
+			SimpleSAML\Logger::warning('walkin->allowedEntityIds is empty, no resource can be accessed as walkin');
 
 		$this->attributes = $cfgParse->getArray('attributes', array());
 	}
@@ -74,17 +79,17 @@ class sspmod_walkin_Auth_Source_LibraryWalkIn extends SimpleSAML_Auth_Source {
 		SimpleSAML_Auth_Source::completeAuth($state);
 	}
 
-	/**
-	 * Determines whether current user can login as a walkin
-	 *
-	 * @param array $config
-	 * @param array $state
-	 * @param sspmod_walkin_Auth_Source_LibraryWalkIn $thisInstance
-	 * 	 (optional)
-	 *
-	 * @return bool $canBeWalkIn
-	 * @throws SimpleSAML_Error_Error
-	 */
+    /**
+     * Determines whether current user can login as a walkin
+     *
+     * @param array $config
+     * @param array $state
+     * @param sspmod_walkin_Auth_Source_LibraryWalkIn $thisInstance
+     *     (optional)
+     * @return bool $canBeWalkIn
+     * @throws Exception
+     * @throws SimpleSAML_Error_Error
+     */
 	public static function canBeWalkIn($config, $state, $thisInstance = null) {
 
 		if ($state === null)
@@ -120,7 +125,7 @@ class sspmod_walkin_Auth_Source_LibraryWalkIn extends SimpleSAML_Auth_Source {
 		
 		# Check that requested entityId is within set of allowed entity ids
 		$entityIdSupported = in_array($entityId, $allowedEntityIds);
-		SimpleSAML_Logger::info('Checking if entityId "' . $entityId . '" accepts walkin users -> ' . ( $entityIdSupported ? 'TRUE' : 'FALSE'));
+		SimpleSAML\Logger::info('Checking if entityId "' . $entityId . '" accepts walkin users -> ' . ( $entityIdSupported ? 'TRUE' : 'FALSE'));
 
 		# Throw errors only if we are calling this from this class
 		if ($thisInstance !== NULL) {
@@ -167,8 +172,8 @@ class sspmod_walkin_Auth_Source_LibraryWalkIn extends SimpleSAML_Auth_Source {
 			}
 		}
 
-		SimpleSAML_Logger::info('IP address ' . $userIp . ($cidrMatches ? ' belongs ' : " doesn't belong ") . 'to any following CIDR: ' . join(', ', $cidrs));
-		
+		SimpleSAML\Logger::info('IP address ' . $userIp . ($cidrMatches ? ' belongs ' : " doesn't belong ") . 'to any following CIDR: ' . join(', ', $cidrs));
+
 		return $cidrMatches;
 	}
 

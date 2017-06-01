@@ -402,6 +402,28 @@ $config = array(
         ),
 
     ),
+    'walkin' => array(
+        'walkin:LibraryWalkIn',
+        'libraryCIDRs' => array('127.0.0.1/32'),
+        'attributes' => array(
+            'eduPersonScopedAffiliation' => array('*'),
+            'eduPersonAffiliation' => array(sspmod_walkin_Auth_Source_LibraryWalkIn::LIBRARY_WALK_IN_AFFILIATION),
+            #'eduPersonPrincipalName' => array('okay'),
+        ),
+        'allowedEntityIds' => array(
+            # OXFORD MUSIC ONLINE - cannot be part of this, because it requires eduPersonPrincipalName
+            'https://shibboleth2sp.sams.oup.com/shibboleth',
+
+            # ProQuest Ebook Central - shows some king of error :/
+            "https://sp.eblib.com/shibboleth",
+
+            # Springerlink - also error :/
+            "https://fsso.springer.com",
+
+            # All other MZK's databases & resources are available without logging in .. from the library (by it's IP)
+            "https://vufind.mzk.cz/",
+        ),
+    ),
     */
 
 );

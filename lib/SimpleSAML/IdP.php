@@ -47,14 +47,6 @@ class SimpleSAML_IdP
 
 
     /**
-     * Our authsource.
-     *
-     * @var SimpleSAML_Auth_Simple
-     */
-    private $authSource;
-
-
-    /**
      * Initialize an IdP.
      *
      * @param string $id The identifier of this IdP.
@@ -108,6 +100,14 @@ class SimpleSAML_IdP
             throw new SimpleSAML_Error_Exception('No such "'.$auth.'" auth source found.');
         }
     }
+
+
+    /**
+     * Our authsource.
+     *
+     * @var SimpleSAML_Auth_Simple
+     */
+    private $authSource;
 
 
     /**
@@ -402,6 +402,21 @@ class SimpleSAML_IdP
             $needAuth = true;
         } else {
             $needAuth = !$this->isAuthenticated();
+        }
+
+        $walkin = SimpleSAML_Configuration::getConfig('authsources.php')->getArray('walkin', false);
+
+        if (!$needAuth && $walkin !== false && isset($walkin['allowedEntityIds'])) {
+            $allowedEntityId = in_array($spEntityId, $walkin['allowedEntityIds']);
+            $session = SimpleSAML_Session::getSessionFromRequest();
+            $isWalkIn = $session->isLoggedInAsWalkIn($this->authSource->authSource);
+
+            if (!$allowedEntityId && $isWalkIn) {
+                // User, logged in as walkin elsewhere is trying to access different SP, which doesn't support SP,
+                // so just cancel the session with walkin and let him enter his credentials ..
+                $session->doLogout($this->authSource->authSource);
+                $needAuth = true;
+            }
         }
 
         $state['IdPMetadata'] = $this->getConfig()->toArray();

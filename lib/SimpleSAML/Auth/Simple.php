@@ -14,7 +14,7 @@ class SimpleSAML_Auth_Simple
      *
      * @var string
      */
-    private $authSource;
+    public $authSource;
 
 
     /**
