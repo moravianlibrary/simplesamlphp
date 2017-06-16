@@ -1,8 +1,8 @@
 <?php
-    $theme = 'light';
-    if (isset($_SERVER['SIMPLESAMLPHP_THEME'])) {
-        $theme = $_SERVER['SIMPLESAMLPHP_THEME'];
-    }
+	$theme = 'light';
+	if (isset($_SERVER['SIMPLESAMLPHP_THEME'])) {
+		$theme = $_SERVER['SIMPLESAMLPHP_THEME'];
+	}
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" data-tldr="true">
@@ -32,37 +32,37 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <!-- End Google Tag Manager -->
 
 <?php
-    $loginRecoveryLink = "";
-    $passwordRecoveryLink = "";
-    $registeryLink = "";
+	$loginRecoveryLink = "";
+	$passwordRecoveryLink = "";
+	$registeryLink = "";
 
-    $current_lang = "en";
-    $languages = $this->getLanguageList();
-    foreach ($languages AS $lang => $current) {
-         if ($current) {
-             $current_lang = $lang;
-         }
-    } 
-    if ($current_lang == 'en') {
-        $switch_lang = 'cs';
-    } else {
-        $switch_lang = 'en';
-    }
-    $params = array('language' => $switch_lang);
-    foreach ($this->data['stateparams'] as $name => $value) {
-        $params[$name] = $value;
-    }
-    $href = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), $params));
-    $img = SimpleSAML_Module::getModuleURL('knihovny/'.$switch_lang.'.gif');
-    $lang = "<a href='$href'> <img align='right' src='$img'/> </a>";
-    $login_str = ($current_lang == 'en')?"Username":"Uživatelské jméno";
+	$current_lang = "en";
+	$languages = $this->getLanguageList();
+	foreach ($languages AS $lang => $current) {
+		if ($current) {
+			$current_lang = $lang;
+		}
+	}
+	if ($current_lang == 'en') {
+		$switch_lang = 'cs';
+	} else {
+		$switch_lang = 'en';
+	}
+	$params = array('language' => $switch_lang);
+	foreach ($this->data['stateparams'] as $name => $value) {
+		$params[$name] = $value;
+	}
+	$href = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), $params));
+	$img = SimpleSAML_Module::getModuleURL('knihovny/'.$switch_lang.'.gif');
+	$lang = "<a href='$href'> <img align='right' src='$img'/> </a>";
+	$login_str = ($current_lang == 'en')?"Username":"Uživatelské jméno";
 
-    $error = false;
-    $content = trim(file_get_contents("/data/www/idps-hosted/maintenance.txt"));
-    if ($content != "") {
-       $error = true;
-       $error_str = "{login:maintenance_in_progress}"; // "You can't login at this time. Maintenance in progress.";
-    }
+	$error = false;
+	$content = trim(file_get_contents("/data/www/idps-hosted/maintenance.txt"));
+	if ($content != "") {
+		$error = true;
+		$error_str = "{login:maintenance_in_progress}"; // "You can't login at this time. Maintenance in progress.";
+	}
 ?>
 
 <div class="container">
@@ -77,12 +77,11 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 					<span align='right'><?php echo $lang; ?></span>
 				</p>
 				<p><h1><?php echo $this->t('{knihovny:login:institution_login}'); ?></h1></p>
-                                <?php if($error) {
-                                ?>
-                                <p style="color:#EF406B;">
-                                   <h3 style="color:#EF406B;"><?php echo $this->t($error_str);?> </br> <?php echo $error_str_add; ?> </h3>
-                                <p>
-                                <?php } else { ?>
+				<?php if($error) { ?>
+					<p style="color:#EF406B;">
+						<h3 style="color:#EF406B;"><?php echo $this->t($error_str);?> </br> <?php echo $error_str_add; ?> </h3>
+					<p>
+				<?php } else { ?>
 				<div class="loginform-wrapper">
 				<p>
 					<label><?php echo $login_str; ?><br />					
