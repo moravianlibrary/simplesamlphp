@@ -83,7 +83,7 @@ $maintenance_file = '/opt/shibboleth/simplesamlphp/config/maintenance.txt';
 			<?php } ?>
 
 			<div class="service-btn">
-				<a class="btn" href="http://aleph.mzk.cz/cgi-bin/login_recovery.pl"><?php echo $this->t('{mzk:login:forgotten_login}'); ?></a>
+				<a class="btn" href="https://aleph.mzk.cz/cgi-bin/login_recovery.pl"><?php echo $this->t('{mzk:login:forgotten_login}'); ?></a>
 				<a class="btn" href="https://aleph.mzk.cz/cgi-bin/password_recovery.pl"><?php echo $this->t('{mzk:login:password_recovery}'); ?></a>
 			</div>
 		</div>
