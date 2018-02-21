@@ -693,6 +693,9 @@ msgstr "Lokální identifikační kód"
 msgid "{login:next}"
 msgstr "Další"
 
+msgid "{login:remember_me}"
+msgstr "Zapamatuj si mě"
+
 msgid "{errors:descr_GENERATEAUTHNRESPONSE}"
 msgstr ""
 "Při vytváření přihlašovací odpovědi tímto poskytovatelem identity, "
