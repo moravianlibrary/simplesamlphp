@@ -8,9 +8,10 @@
 	}
 	$switch_lang = ($current_lang == 'en') ? 'cs' : 'en';
 	$params = array('language' => $switch_lang);
-	if (array_key_exists('stateparams', $this->data))
-	foreach ($this->data['stateparams'] as $name => $value) {
-		$params[$name] = $value;
+	if (array_key_exists('stateparams', $this->data)) {
+		foreach ($this->data['stateparams'] as $name => $value) {
+			$params[$name] = $value;
+		}
 	}
 	$href = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), $params));
 	$img = SimpleSAML_Module::getModuleURL('mzk/'.$switch_lang.'.gif');
