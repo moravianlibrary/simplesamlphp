@@ -1548,3 +1548,5 @@ msgstr ""
 "Přistupujete k Assertion Consumer Service rozhraní, ale neposílálate SAML"
 " Authentication Response."
 
+msgid "{login:remember_me}"
+msgstr "Zapamatuj si mě"
