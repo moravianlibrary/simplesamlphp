@@ -16,6 +16,7 @@ if (!$cron->isValidTag($_REQUEST['tag'])) {
     exit;
 }
 
+ini_set('memory_limit','512M');
 
 $url = \SimpleSAML\Utils\HTTP::getSelfURL();
 $time = date(DATE_RFC822);
