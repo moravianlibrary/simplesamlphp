@@ -37,7 +37,11 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 
 		$this->trustSSLHost = $config['trustSSLHost'];
 		$this->certificateAuthority = $config['certificateAuthority'];
-		$this->eduPersonScopedAffiliation = $config['eduPersonScopedAffiliation'];
+		if (isset($config['eduPersonScopedAffiliation'])) {
+			$this->eduPersonScopedAffiliation = $config['eduPersonScopedAffiliation'];
+		} else {
+			$this->eduPersonScopedAffiliation = 'member@' . $this->eppnScope;
+		}
 
 		$this->toAgencyId = $config['toAgencyId'];
 		$this->fromAgencyId = $config['fromAgencyId'];
@@ -141,7 +145,7 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 					'cn' => empty( $fullname ) ? [] : array( $fullname ),
 					'o' => empty( $this->organizationName ) ? [] : array( $this->organizationName ),
 					'userHomeLibrary' => empty( $agencyId ) ? [] : array( $agencyId ),
-					);
+			);
 
 			if ($mail !== null)
 				$providedAttributes['mail'] = array( $mail );
