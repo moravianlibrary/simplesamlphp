@@ -38,9 +38,9 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 		$this->trustSSLHost = $config['trustSSLHost'];
 		$this->certificateAuthority = $config['certificateAuthority'];
 		if (isset($config['eduPersonScopedAffiliation'])) {
-			$this->eduPersonScopedAffiliation = $config['eduPersonScopedAffiliation'];
+			$this->eduPersonScopedAffiliation = array($config['eduPersonScopedAffiliation']);
 		} else {
-			$this->eduPersonScopedAffiliation = 'member@' . $this->eppnScope;
+			$this->eduPersonScopedAffiliation = array('member@' . $this->eppnScope);
 		}
 
 		$this->toAgencyId = $config['toAgencyId'];
