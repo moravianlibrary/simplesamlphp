@@ -541,6 +541,11 @@ class SimpleSAML_Metadata_SAMLBuilder
 
         $e = new \SAML2\XML\md\IDPSSODescriptor();
         $e->protocolSupportEnumeration[] = 'urn:oasis:names:tc:SAML:2.0:protocol';
+        if ($metadata->hasValue('other.protocols')) {
+            foreach ($metadata->getArray('other.protocols') as $protocol) {
+                $e->protocolSupportEnumeration[] = $protocol;
+            }
+        }
 
         if ($metadata->hasValue('sign.authnrequest')) {
             $e->WantAuthnRequestsSigned = $metadata->getBoolean('sign.authnrequest');

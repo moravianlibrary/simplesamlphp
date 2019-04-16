@@ -138,6 +138,10 @@ try {
         $metaArray['RepublishTargets'] = $idpmeta->getArray('RepublishTargets');
     }
 
+    if ($idpmeta->hasValue('other.protocols')) {
+        $metaArray['other.protocols'] = $idpmeta->getArray('other.protocols');
+    }
+
     if ($idpmeta->hasValue('OrganizationName')) {
         $metaArray['OrganizationName'] = $idpmeta->getLocalizedString('OrganizationName');
         $metaArray['OrganizationDisplayName'] = $idpmeta->getLocalizedString(
