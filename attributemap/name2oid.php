@@ -181,6 +181,7 @@ $attributemap = array(
     'uid'                           => 'urn:oid:0.9.2342.19200300.100.1.1',
     'uniqueIdentifier'              => 'urn:oid:0.9.2342.19200300.100.1.44',
     'uniqueMember'                  => 'urn:oid:2.5.4.50',
+    'unstructuredName'              => 'urn:oid:1.2.840.113549.1.9.2',
     'userCertificate'               => 'urn:oid:2.5.4.36',
     'userClass'                     => 'urn:oid:0.9.2342.19200300.100.1.8',
     'userPKCS12'                    => 'urn:oid:2.16.840.1.113730.3.1.216',
