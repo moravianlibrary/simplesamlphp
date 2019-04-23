@@ -1,5 +1,7 @@
 <?php
 
+setlocale(LC_ALL, "en_US.UTF-8");
+
 /**
  * Disable magic quotes if they are enabled.
  */
