@@ -27,7 +27,7 @@ class sspmod_mzk_Auth_Process_AffilationFilterLDAP extends SimpleSAML_Auth_Proce
 	 */
 	public function process(&$request) {
 		$attributes =& $request['Attributes'];
-		if ($attributes["source"][0] == "bupu.mzk.cz" || $attributes["source"][0] == "ldap://ad.mzk.cz:50389") {
+	        if ($attributes["source"][0] == "ldap://ad.staff.mzk.cz:389") {
 			$attributes["eduPersonAffiliation"][] = "staff";
 			$attributes["eduPersonScopedAffiliation"][] = "staff@mzk.cz";
 			$attributes["eduPersonAffiliation"][] = "member";
