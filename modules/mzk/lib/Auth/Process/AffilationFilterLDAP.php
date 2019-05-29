@@ -36,6 +36,7 @@ class sspmod_mzk_Auth_Process_AffilationFilterLDAP extends SimpleSAML_Auth_Proce
 			$attributes["eduPersonAffiliation"][] = "employee";
 			$attributes["eduPersonScopedAffiliation"][] = "employee@mzk.cz";
 			$attributes["mzkPermission"][] = "wifi";
+			$attributes["eduPersonEntitlement"][] = "urn:mace:dir:entitlement:common-lib-terms";
 		}
 		if (in_array('mzkWifiAccount', $attributes['objectClass'])) {
 			$attributes["mzkPermission"][] = "wifi";
@@ -43,6 +44,7 @@ class sspmod_mzk_Auth_Process_AffilationFilterLDAP extends SimpleSAML_Auth_Proce
 		if (in_array('mzkProxyAccount', $attributes['objectClass'])) {
 			$attributes["eduPersonAffiliation"][] = "member";
 			$attributes["eduPersonScopedAffiliation"][] = "member@mzk.cz";
+			$attributes["eduPersonEntitlement"][] = "urn:mace:dir:entitlement:common-lib-terms";
 		}
 	}
 
