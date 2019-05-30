@@ -137,7 +137,7 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 			}
 
 			$providedAttributes = array(
-					'eduPersonPrincipalName' => array( $username . '@' . $this->eppnScope ),
+					'eduPersonPrincipalName' => array( $userId . '@' . $this->eppnScope ),
 					'eduPersonScopedAffiliation' => $this->eduPersonScopedAffiliation,
 					'userLibraryId' => array( $userId ),
 					'givenName' => empty( $firstname ) ? [] : array( $firstname ),
