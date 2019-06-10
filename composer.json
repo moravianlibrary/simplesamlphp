@@ -43,7 +43,8 @@
         "twig/twig": "~1.0",
         "gettext/gettext": "^3.5",
         "jaimeperez/twig-configurable-i18n": "^1.2",
-        "openid/php-openid": "2.3.0"
+        "openid/php-openid": "2.3.0",
+        "simplesamlphp/simplesamlphp-module-entitycategories": "dev-master"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.8",
