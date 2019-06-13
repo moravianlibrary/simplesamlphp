@@ -147,49 +147,6 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 		return $providedAttributes;
 	}
 
-		$providedAttributes = array(
-				'eduPersonPrincipalName' => array( $username . '@' . $this->eppnScope ),
-				'eduPersonUniqueId' => array( $userId . '@' . $this->eppnScope ),
-				'eduPersonScopedAffiliation' => $this->eduPersonScopedAffiliation,
-				'userLibraryId' => array( $userId ),
-				'givenName' => empty( $firstname ) ? [] : array( $firstname ),
-				'sn' => empty( $lastname ) ? [] : array( $lastname ),
-				'cn' => empty( $fullname ) ? [] : array( $fullname ),
-				'o' => empty( $this->organizationName ) ? [] : array( $this->organizationName ),
-				'userHomeLibrary' => empty( $agencyId ) ? [] : array( $agencyId ),
-		);
-
-		if ($mail !== null) {
-			$providedAttributes['mail'] = array( $mail );
-		}
-
-		$isEmployee = false;
-		// Note that this is only applyable for Koha
-		if ($privilegeType === 'KN' || $privilegeType === 'S') {
-			$providedAttributes['eduPersonScopedAffiliation'][] = 'employee@' . $this->eppnScope;
-			$providedAttributes['eduPersonScopedAffiliation'][] = 'staff@' . $this->eppnScope;
-			$isEmployee = true;
-		}
-
-		if ($isEmployee) {
-
-			if ($tel !== null) {
-				$providedAttributes['telephoneNumber'] = array( $tel );
-			}
-
-			$providedAttributes['commonNameASCII'] = array( $this->removeAccents($providedAttributes['cn'][0]) );
-			if ($mail !== null) {
-				$providedAttributes['authMail'] = array( $mail );
-			}
-
-			$providedAttributes['unstructuredName'] = array( $userId );
-			$providedAttributes['eduPersonEntitlement'] = array( 'urn:mace:terena.org:tcs:escience-user' );
-			$providedAttributes['commonNameASCII'] = array( $this->remove_accents($providedAttributes['cn'][0]) );
-		}
-
-		return $providedAttributes;
-	}
-
 	protected function doRequest($body, $username) {
 		$req = curl_init($this->url);
 		curl_setopt($req, CURLOPT_POST, 1);
