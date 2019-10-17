@@ -19,6 +19,8 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 
 	protected $organizationName;
 
+	protected $proxyServer;
+
 	public function __construct($info, &$config) {
 		parent::__construct($info, $config);
 
@@ -44,6 +46,8 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 		$this->needsUsername = isset($config['needsUsername']) ? $config['needsUsername'] : false;
 
 		$this->excludeAcademicDegrees = isset($config['excludeAcademicDegrees']) ? $config['excludeAcademicDegrees'] : false;
+		$config = SimpleSAML_Configuration::getConfig();
+		$this->proxyServer = $config->getValue('proxy');
 	}
 
 	public function login($username, $password) {
@@ -155,6 +159,9 @@ class sspmod_xcncip2_Auth_Source_XCNCIP2 extends sspmod_core_Auth_UserPassBase {
 					'Content-type: application/xml; charset=utf-8',
 					));
 		curl_setopt($req, CURLOPT_POSTFIELDS, $body);
+		if ($this->proxyServer) {
+			curl_setopt($req, CURLOPT_PROXY, $this->proxyServer);
+		}
 
 		if ($this->trustSSLHost) {
 			curl_setopt($req, CURLOPT_SSL_VERIFYHOST, 0);
