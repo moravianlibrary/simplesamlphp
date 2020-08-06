@@ -26,6 +26,8 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
 
     protected $proxyServer;
 
+    protected $excludeAcademicDegrees;
+
     protected $blockTypesForDnnt = [
         'Block Electronic Resource Access',
         'Extended Services'
@@ -37,21 +39,19 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
 
         $this->url = $config['url'];
         $this->eppnScope = $config['eppnScope'];
-
         if (empty($this->eppnScope)) {
-            throw new \SimpleSAML\Error\Exception('Cannot have eppnScope empty! .. You have to set it in authsource.php');
+            throw new \SimpleSAML\Error\Exception(
+                'Cannot have eppnScope empty! .. You have to set it in authsource.php'
+            );
         }
 
         $this->trustSSLHost = $config['trustSSLHost'];
         $this->certificateAuthority = $config['certificateAuthority'];
-
         $this->toAgencyId = $config['toAgencyId'];
         $this->fromAgencyId = $config['fromAgencyId'];
         $this->organizationName = $config['organizationName'];
-
-        $this->needsUsername = isset($config['needsUsername']) ? $config['needsUsername'] : false;
-
-        $this->excludeAcademicDegrees = isset($config['excludeAcademicDegrees']) ? $config['excludeAcademicDegrees'] : false;
+        $this->needsUsername = $config['needsUsername'] ?? false;
+        $this->excludeAcademicDegrees = $config['excludeAcademicDegrees'] ?? false;
         $config = \SimpleSAML\Configuration::getConfig();
         $this->proxyServer = $config->getValue('proxy');
     }
@@ -140,21 +140,21 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
                 $fullname .= ' ' . $academicDegreesWordy;
             }
         }
-        $providedAttributes = array(
-                'eduPersonPrincipalName' => array( $userId . '@' . $this->eppnScope ),
-                'eduPersonUniqueId' => array( $userId . '@' . $this->eppnScope ),
-                'unstructuredName' => [$userId],
-                'eduPersonAffiliation' => [$affiliation],
-                'eduPersonScopedAffiliation' => $scopedAffiliation,
-                'userLibraryId' => array( $userId ),
-                'givenName' => empty($firstname) ? [] : array( $firstname ),
-                'sn' => empty($lastname) ? [] : array( $lastname ),
-                'cn' => empty($fullname) ? [] : array( $fullname ),
-                'o' => empty($this->organizationName) ? [] : array( $this->organizationName ),
-                'userHomeLibrary' => empty($agencyId) ? [] : array( $agencyId ),
-        );
+        $providedAttributes = [
+            'eduPersonPrincipalName' => [$userId . '@' . $this->eppnScope],
+            'eduPersonUniqueId' => [$userId . '@' . $this->eppnScope],
+            'unstructuredName' => [$userId],
+            'eduPersonAffiliation' => [$affiliation],
+            'eduPersonScopedAffiliation' => $scopedAffiliation,
+            'userLibraryId' => [$userId],
+            'givenName' => empty($firstname) ? [] : [$firstname],
+            'sn' => empty($lastname) ? [] : [$lastname],
+            'cn' => empty($fullname) ? [] : [$fullname],
+            'o' => empty($this->organizationName) ? [] : [$this->organizationName],
+            'userHomeLibrary' => empty($agencyId) ? [] : [$agencyId],
+        ];
         if ($mail !== null) {
-            $providedAttributes['mail'] = array( $mail );
+            $providedAttributes['mail'] = [$mail];
         }
         return $providedAttributes;
     }
@@ -164,9 +164,9 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         $req = curl_init($this->url);
         curl_setopt($req, CURLOPT_POST, 1);
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($req, CURLOPT_HTTPHEADER, array(
-                    'Content-type: application/xml; charset=utf-8',
-                    ));
+        curl_setopt($req, CURLOPT_HTTPHEADER, [
+            'Content-type: application/xml; charset=utf-8',
+        ]);
         curl_setopt($req, CURLOPT_POSTFIELDS, $body);
         if ($this->proxyServer) {
             curl_setopt($req, CURLOPT_PROXY, $this->proxyServer);
@@ -201,50 +201,37 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
 
     protected function getLookupUserRequest($username, $password)
     {
-        return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' .
-            '<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ' .
-            'ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/' .
-            'xsd/ncip_v2_0.xsd">' .
-            '<ns1:LookupUser>' .
-            '<ns1:InitiationHeader>' .
-            '<ns1:FromAgencyId>' .
-            '<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">' .
-            $this->fromAgencyId .
-            '</ns1:AgencyId>' .
-            '</ns1:FromAgencyId>' .
-            '<ns1:ToAgencyId>' .
-            '<ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">' .
-            $this->toAgencyId .
-            '</ns1:AgencyId>' .
-            '</ns1:ToAgencyId>' .
-            '</ns1:InitiationHeader>' .
-            '<ns1:AuthenticationInput>' .
-            '<ns1:AuthenticationInputData>' .
-            htmlspecialchars($username) .
-            '</ns1:AuthenticationInputData>' .
-            '<ns1:AuthenticationDataFormatType>' .
-            'text/plain' .
-            '</ns1:AuthenticationDataFormatType>' .
-            '<ns1:AuthenticationInputType>' .
-            ($this->needsUsername ? 'Username' : 'User Id') .
-            '</ns1:AuthenticationInputType>' .
-            '</ns1:AuthenticationInput>' .
-            '<ns1:AuthenticationInput>' .
-            '<ns1:AuthenticationInputData>' .
-            htmlspecialchars($password) .
-            '</ns1:AuthenticationInputData>' .
-            '<ns1:AuthenticationDataFormatType>' .
-            'text/plain' .
-            '</ns1:AuthenticationDataFormatType>' .
-            '<ns1:AuthenticationInputType>' .
-            'Password' .
-            '</ns1:AuthenticationInputType>' .
-            '</ns1:AuthenticationInput>' .
-            '<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Name Information</ns1:UserElementType>' .
-            '<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Address Information</ns1:UserElementType>' .
-            '<ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Privilege</ns1:UserElementType>' .
-            '</ns1:LookupUser>' .
-            '</ns1:NCIPMessage>';
+        $username = htmlspecialchars($username);
+        $authInputType = $this->needsUsername ? 'Username' : 'User Id';
+        $password = htmlspecialchars($password);
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+    <ns1:LookupUser>
+        <ns1:InitiationHeader>
+            <ns1:FromAgencyId>
+                <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">$this->fromAgencyId</ns1:AgencyId>
+            </ns1:FromAgencyId>
+            <ns1:ToAgencyId>
+                <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">$this->toAgencyId</ns1:AgencyId>
+            </ns1:ToAgencyId>
+        </ns1:InitiationHeader>
+        <ns1:AuthenticationInput>
+            <ns1:AuthenticationInputData>$username</ns1:AuthenticationInputData>
+            <ns1:AuthenticationDataFormatType>text/plain</ns1:AuthenticationDataFormatType>
+            <ns1:AuthenticationInputType>$authInputType</ns1:AuthenticationInputType>
+        </ns1:AuthenticationInput>
+        <ns1:AuthenticationInput>
+            <ns1:AuthenticationInputData>$password</ns1:AuthenticationInputData>
+            <ns1:AuthenticationDataFormatType>text/plain</ns1:AuthenticationDataFormatType>
+            <ns1:AuthenticationInputType>Password</ns1:AuthenticationInputType>
+        </ns1:AuthenticationInput>
+        <ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Name Information</ns1:UserElementType>
+        <ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Address Information</ns1:UserElementType>
+        <ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Privilege</ns1:UserElementType>
+    </ns1:LookupUser>
+</ns1:NCIPMessage>
+XML;
     }
 
     /**
