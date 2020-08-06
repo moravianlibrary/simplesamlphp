@@ -27,7 +27,7 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase {
 	protected $proxyServer;
 
 	protected $blockTypesForDnnt = [
-	    'Block Electronic Resource Access',
+        'Block Electronic Resource Access',
         'Extended Services'
     ];
 
@@ -134,9 +134,9 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase {
 		$providedAttributes = array(
 				'eduPersonPrincipalName' => array( $userId . '@' . $this->eppnScope ),
 				'eduPersonUniqueId' => array( $userId . '@' . $this->eppnScope ),
-                'unstructuredName' => [$userId],
-                'eduPersonAffiliation' => [$affiliation],
-                'eduPersonScopedAffiliation' => $scopedAffiliation,
+				'unstructuredName' => [$userId],
+				'eduPersonAffiliation' => [$affiliation],
+				'eduPersonScopedAffiliation' => $scopedAffiliation,
 				'userLibraryId' => array( $userId ),
 				'givenName' => empty( $firstname ) ? [] : array( $firstname ),
 				'sn' => empty( $lastname ) ? [] : array( $lastname ),
