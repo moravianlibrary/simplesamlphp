@@ -3,6 +3,9 @@ namespace SimpleSAML\Module\xcncip2\Auth\Source;
 
 class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase {
 
+    const MEMBER_AFFILIATION = 'member';
+    const LIBRARY_WALK_IN_AFFILIATION = 'library-walk-in';
+
 	protected $url;
 
 	protected $eppnScope;
@@ -35,11 +38,6 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase {
 
 		$this->trustSSLHost = $config['trustSSLHost'];
 		$this->certificateAuthority = $config['certificateAuthority'];
-		if (isset($config['eduPersonScopedAffiliation'])) {
-			$this->eduPersonScopedAffiliation = array($config['eduPersonScopedAffiliation']);
-		} else {
-			$this->eduPersonScopedAffiliation = array('member@' . $this->eppnScope);
-		}
 
 		$this->toAgencyId = $config['toAgencyId'];
 		$this->fromAgencyId = $config['fromAgencyId'];
@@ -88,6 +86,17 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase {
 		$unstructuredName = trim((String) $response->xpath(
 				'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:NameInformation/' .
 				'ns1:PersonalNameInformation/ns1:UnstructuredPersonalUserName')[0]);
+        $validToDate = $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserPrivilege/' .
+            'ns1:ValidToDate'
+        );
+
+        $validToDate = !empty($validToDate)
+            ? new \DateTime((string)$validToDate[0]) : null;
+        $current = new \DateTime();
+        $affiliation = ($validToDate >= $current)
+            ? self::MEMBER_AFFILIATION : self::LIBRARY_WALK_IN_AFFILIATION;
+        $scopedAffiliation = [$affiliation . '@' . $this->eppnScope];
 		$academicDegrees = [];
 		if (! empty($unstructuredName)) {
 			// Assume the last word is firstname, all other words are part of lastname
@@ -119,7 +128,8 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase {
 		$providedAttributes = array(
 				'eduPersonPrincipalName' => array( $userId . '@' . $this->eppnScope ),
 				'eduPersonUniqueId' => array( $userId . '@' . $this->eppnScope ),
-				'eduPersonScopedAffiliation' => $this->eduPersonScopedAffiliation,
+                'eduPersonAffiliation' => [$affiliation],
+                'eduPersonScopedAffiliation' => $scopedAffiliation,
 				'userLibraryId' => array( $userId ),
 				'givenName' => empty( $firstname ) ? [] : array( $firstname ),
 				'sn' => empty( $lastname ) ? [] : array( $lastname ),
@@ -229,6 +239,5 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase {
 	protected function removeAccents($string) {
 		return iconv("UTF-8", "ASCII//TRANSLIT", $string);
 	}
-
 }
 ?>
