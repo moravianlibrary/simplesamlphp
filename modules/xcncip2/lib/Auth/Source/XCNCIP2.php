@@ -128,6 +128,7 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase {
 		$providedAttributes = array(
 				'eduPersonPrincipalName' => array( $userId . '@' . $this->eppnScope ),
 				'eduPersonUniqueId' => array( $userId . '@' . $this->eppnScope ),
+                'unstructuredName' => [$userId],
                 'eduPersonAffiliation' => [$affiliation],
                 'eduPersonScopedAffiliation' => $scopedAffiliation,
 				'userLibraryId' => array( $userId ),
