@@ -50,8 +50,9 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         $this->toAgencyId = $config['toAgencyId'];
         $this->fromAgencyId = $config['fromAgencyId'];
         $this->organizationName = $config['organizationName'];
-        $this->needsUsername = $config['needsUsername'] ?? false;
-        $this->excludeAcademicDegrees = $config['excludeAcademicDegrees'] ?? false;
+        $this->needsUsername = isset($config['needsUsername']) ? $config['needsUsername'] : false;
+        $this->excludeAcademicDegrees = isset($config['excludeAcademicDegrees']) ?
+            $config['excludeAcademicDegrees'] : false;
         $config = \SimpleSAML\Configuration::getConfig();
         $this->proxyServer = $config->getValue('proxy');
     }
