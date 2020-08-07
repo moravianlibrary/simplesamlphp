@@ -14,8 +14,6 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
 
     protected $certificateAuthority;
 
-    protected $eduPersonScopedAffiliation;
-
     protected $toAgencyId;
 
     protected $fromAgencyId;
@@ -109,7 +107,6 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         $affiliation = ($validToDate >= $current
             && !$this->isUserBlockedForDnnt($response))
             ? self::MEMBER_AFFILIATION : self::LIBRARY_WALK_IN_AFFILIATION;
-        $scopedAffiliation = [$affiliation . '@' . $this->eppnScope];
 
         $academicDegrees = [];
         if (! empty($unstructuredName)) {
@@ -146,7 +143,6 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             'eduPersonUniqueId' => [$userId . '@' . $this->eppnScope],
             'unstructuredName' => [$userId],
             'eduPersonAffiliation' => [$affiliation],
-            'eduPersonScopedAffiliation' => $scopedAffiliation,
             'userLibraryId' => [$userId],
             'givenName' => empty($firstname) ? [] : [$firstname],
             'sn' => empty($lastname) ? [] : [$lastname],
