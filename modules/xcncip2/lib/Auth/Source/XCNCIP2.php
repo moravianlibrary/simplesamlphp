@@ -74,15 +74,25 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         $agencyId = trim((String) $response->xpath(
             'ns1:LookupUserResponse/ns1:UserId/ns1:AgencyId'
         )[0]);
-        $electronicAddresses = $response->xpath(
-            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserAddressInformation/ns1:ElectronicAddress'
+        // Tritius - email is in PhysicalAddress
+        $electronicAddresses = array_merge(
+            $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserAddressInformation/ns1:ElectronicAddress'),
+            $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserAddressInformation/ns1:PhysicalAddress')
         );
         $mail = $tel = null;
         foreach ($electronicAddresses as $recent) {
-            if (strpos((String) $recent->xpath('ns1:ElectronicAddressType')[0], 'mail') !== false) {
-                $mail = trim((String) $recent->xpath('ns1:ElectronicAddressData')[0]);
-            } elseif (strpos((String) $recent->xpath('ns1:ElectronicAddressType')[0], 'tel') !== false) {
-                $tel = trim((String) $recent->xpath('ns1:ElectronicAddressData')[0]);
+            $recent->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+            $type = $recent->xpath('ns1:ElectronicAddressType');
+            $data = $recent->xpath('ns1:ElectronicAddressData');
+            if (empty($type) || empty($data)) {
+                continue;
+            }
+            $type = (String) $type[0];
+            $data = trim((String) $data[0]);
+            if (strpos($type, 'mail') !== false) {
+                $mail = $data;
+            } elseif (strpos($type, 'tel') !== false) {
+                $tel = $data;
             }
         }
         $firstname = trim((String) $response->xpath(
