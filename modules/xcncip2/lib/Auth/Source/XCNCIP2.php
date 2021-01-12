@@ -79,7 +79,7 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserAddressInformation/ns1:ElectronicAddress'),
             $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserAddressInformation/ns1:PhysicalAddress')
         );
-        $mail = $tel = null;
+        $mail = $telephoneNumber = null;
         foreach ($electronicAddresses as $recent) {
             $recent->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
             $type = $recent->xpath('ns1:ElectronicAddressType');
@@ -92,7 +92,7 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             if (strpos($type, 'mail') !== false) {
                 $mail = $data;
             } elseif (strpos($type, 'tel') !== false) {
-                $tel = $data;
+                $telephoneNumber = $data;
             }
         }
         $firstname = trim((String) $response->xpath(
@@ -162,6 +162,9 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         ];
         if ($mail !== null) {
             $providedAttributes['mail'] = [$mail];
+        }
+        if ($telephoneNumber !== null) {
+            $providedAttributes['telephoneNumber'] = [$telephoneNumber];
         }
         return $providedAttributes;
     }
