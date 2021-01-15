@@ -195,10 +195,10 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         }
 
         // Do not log the real NCIP request body, it contains private credentials!!!!
-        \SimpleSAML\Logger::info("NCIP request sent to $this->url: ". $this->getLookupUserRequest($username, "********"));
+        \SimpleSAML\Logger::debug("NCIP request sent to $this->url: ". $this->getLookupUserRequest($username, "********"));
 
         $response = curl_exec($req);
-        \SimpleSAML\Logger::info("NCIP response: ". $response);
+        \SimpleSAML\Logger::debug("NCIP response: ". $response);
         $result = simplexml_load_string($response);
 
         if (is_a($result, 'SimpleXMLElement')) {
