@@ -58,11 +58,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 	$login_str = ($current_lang == 'en')?"Username":"Uživatelské jméno";
 
 	$error = false;
-	$content = trim(file_get_contents("/data/www/idps-hosted/maintenance.txt"));
-	if ($content != "") {
-		$error = true;
-		$error_str = "{login:maintenance_in_progress}"; // "You can't login at this time. Maintenance in progress.";
-	}
 ?>
 
 <div class="container">
