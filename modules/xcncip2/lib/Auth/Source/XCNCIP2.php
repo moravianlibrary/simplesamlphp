@@ -159,6 +159,7 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             'cn' => empty($fullname) ? [] : [$fullname],
             'o' => empty($this->organizationName) ? [] : [$this->organizationName],
             'userHomeLibrary' => empty($agencyId) ? [] : [$agencyId],
+            'pseudonym' => [$username]
         ];
         if ($mail !== null) {
             $providedAttributes['mail'] = [$mail];
