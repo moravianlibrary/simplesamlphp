@@ -31,12 +31,22 @@ class EduPersonTargetedIDLogger extends \SimpleSAML\Auth\ProcessingFilter {
     public function process(&$request) {
         assert('is_array($request)');
         assert('array_key_exists("Attributes", $request)');
-        $attributes = & $request['Attributes'];
-        $metadata = & $request['SPMetadata'];
+        $attributes = &$request['Attributes'];
+        $metadata = &$request['SPMetadata'];
+        $pseudonym = $attributes['pseudonym'][0];
         $eduPersonPrincipalName = $attributes['eduPersonPrincipalName'][0];
         $eduPersonTargetedID = $attributes['eduPersonTargetedID'][0]->getValue();
+        $pseudonym = null;
+        if (!empty($attributes['pseudonym'])) {
+            $pseudonym = $attributes['pseudonym'][0];
+        }
         $consumerService = $metadata['entityid'];
-        \SimpleSAML\Logger::info("$eduPersonPrincipalName ($eduPersonTargetedID) accesses $consumerService");
+        if ($pseudonym != null) {
+            \SimpleSAML\Logger::info("User $eduPersonPrincipalName ($eduPersonTargetedID) with"
+                 . " username $pseudonym accesses $consumerService");
+        } else {
+            \SimpleSAML\Logger::info("User $eduPersonPrincipalName ($eduPersonTargetedID) accesses $consumerService");
+        }
     }
 
 }
