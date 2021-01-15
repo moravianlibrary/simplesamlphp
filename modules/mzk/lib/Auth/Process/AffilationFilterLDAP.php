@@ -31,6 +31,10 @@ class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
             $attributes["eduPersonScopedAffiliation"][] = "employee@mzk.cz";
             $attributes["mzkPermission"][] = "wifi";
             $attributes["eduPersonEntitlement"][] = "urn:mace:dir:entitlement:common-lib-terms";
+            if (in_array('CN=cesnet-tcs-certs,OU=Groups,DC=staff,DC=mzk,DC=cz', $attributes['memberOf'])) {
+                $attributes["eduPersonEntitlement"][] = "urn:mace:terena.org:tcs:personal-user";
+                $attributes["eduPersonEntitlement"][] = "urn:mace:terena.org:tcs:escience-user";
+            }
         }
         if (in_array('mzkWifiAccount', $attributes['objectClass'])) {
             $attributes["mzkPermission"][] = "wifi";
