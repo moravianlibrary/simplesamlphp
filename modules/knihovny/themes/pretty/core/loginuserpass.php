@@ -10,7 +10,7 @@
 	<title><?php echo $this->t('{login:user_pass_header}'); ?></title>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 
-	<link rel='stylesheet' href="<?php echo SimpleSAML_Module::getModuleURL('knihovny/'. $theme . '.css?v0'); ?>" type='text/css' />
+	<link rel='stylesheet' href="<?php echo SimpleSAML\Module::getModuleURL('knihovny/'. $theme . '.css?v0'); ?>" type='text/css' />
 	<!--[if IE]><style type="text/css">#login h1 a { margin-top: 35px; } #login #login_error { margin-bottom: 10px; }</style><![endif]--><!-- Curse you, IE! -->
 
 	<script type="text/javascript">
@@ -52,8 +52,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 	foreach ($this->data['stateparams'] as $name => $value) {
 		$params[$name] = $value;
 	}
-	$href = htmlspecialchars(SimpleSAML_Utilities::addURLparameter(SimpleSAML_Utilities::selfURL(), $params));
-	$img = SimpleSAML_Module::getModuleURL('knihovny/'.$switch_lang.'.gif');
+	$href = htmlspecialchars(SimpleSAML\Utilities::addURLparameter(SimpleSAML\Utilities::selfURL(), $params));
+	$img = SimpleSAML\Module::getModuleURL('knihovny/'.$switch_lang.'.gif');
 	$lang = "<a href='$href'> <img align='right' src='$img'/> </a>";
 	$login_str = ($current_lang == 'en')?"Username":"Uživatelské jméno";
 
