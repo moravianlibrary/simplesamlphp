@@ -1,8 +1,11 @@
 <?php
 namespace SimpleSAML\Module\xcncip2\Auth\Source;
 
+use SimpleSAML\Error\Exception;
+
 class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
 {
+
     const MEMBER_AFFILIATION = 'member';
     const LIBRARY_WALK_IN_AFFILIATION = 'library-walk-in';
 
@@ -25,6 +28,13 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
     protected $proxyServer;
 
     protected $excludeAcademicDegrees;
+
+    /**
+     * OAuth2 configuration if needed
+     *
+     * @var array
+     */
+    protected $oAuth2;
 
     protected $blockTypesForDnnt = [
         'Block Electronic Resource Access',
@@ -51,6 +61,10 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         $this->needsUsername = isset($config['needsUsername']) ? $config['needsUsername'] : false;
         $this->excludeAcademicDegrees = isset($config['excludeAcademicDegrees']) ?
             $config['excludeAcademicDegrees'] : false;
+        $this->oAuth2 = $config['oAuth2'] ?? [];
+        $this->oAuth2['grantType'] = $this->oAuth2['grantType'] ?? 'client_credentials';
+        $this->validateOAuth2configuration();
+
         $config = \SimpleSAML\Configuration::getConfig();
         $this->proxyServer = $config->getValue('proxy');
     }
@@ -174,7 +188,13 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         // Do not log the real NCIP request body, it contains private credentials!!!!
         \SimpleSAML\Logger::debug("NCIP request sent to $this->url: ". $this->getLookupUserRequest($username, "********"));
 
-        $response = $this->doHttpRequest($this->url, $body);
+        $headers = ['Content-type: application/xml; charset=utf-8'];
+        if (!empty($this->oAuth2)) {
+            $tokenHeader = $this->getOAuth2TokenHeader();
+            $headers[] = $tokenHeader;
+        }
+
+        $response = $this->doHttpRequest($this->url, $body, $headers);
         \SimpleSAML\Logger::debug("NCIP response: ". $response);
         $result = simplexml_load_string($response);
 
@@ -262,14 +282,12 @@ XML;
      *
      * @return bool|string
      */
-    protected function doHttpRequest(string $url, string $body)
+    protected function doHttpRequest(string $url, string $body, array $headers = ['Content-type: application/xml; charset=utf-8'])
     {
         $req = curl_init($url);
         curl_setopt($req, CURLOPT_POST, 1);
         curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($req, CURLOPT_HTTPHEADER, array(
-            'Content-type: application/xml; charset=utf-8',
-        ));
+        curl_setopt($req, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($req, CURLOPT_POSTFIELDS, $body);
         if ($this->proxyServer) {
             curl_setopt($req, CURLOPT_PROXY, $this->proxyServer);
@@ -286,5 +304,55 @@ XML;
                 curl_setopt($req, CURLOPT_CAINFO, $this->certificateAuthority);
         }
         return curl_exec($req);
+    }
+
+    /**
+     * Validate OAuth2 configuration options
+     *
+     * @return void
+     * @throws Exception
+     */
+    protected function validateOAuth2configuration(): void
+    {
+        // empty config, not using OAuth2
+        if (empty($this->oAuth2)) {
+           return;
+        }
+        $neededOptions = ['tokenEndpoint', 'clientId', 'clientSecret'];
+        foreach ($neededOptions as $option ) {
+            if (empty($this->oAuth2[$option] ?? null)) {
+                throw new Exception(sprintf('Missing needed configuration for OAuth2: '. $option));
+            }
+        }
+    }
+
+    /**
+     * Return header string for authorization
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function getOAuth2TokenHeader()
+    {
+        $headers = ['Accept: application/json'];
+        $postFields = [
+            'grant_type' => $this->oAuth2['grantType'],
+        ];
+        if ($this->oAuth2['tokenBasicAuth']) {
+            $headers[] = 'Authorization: Basic ' . base64_encode($this->oAuth2['clientId'] . ':' . $this->oAuth2['clientSecret']);
+        } else {
+            $postFields['client_id'] = $this->oAuth2['clientId'];
+            $postFields['client_secret'] = $this->oAuth2['clientSecret'];
+        }
+        $body = http_build_query($postFields);
+        $response = $this->doHttpRequest($this->oAuth2['tokenEndpoint'], $body, $headers);
+        if ($response === false) {
+            throw new Exception('Error while getting OAuth2 access token');
+        }
+        $tokenData = json_decode($response, true);
+        if (key_exists('error', $tokenData)) {
+            throw new Exception('Error while getting OAuth2 access token: ' . $tokenData['error']);
+        }
+        return 'Authorization: ' . $tokenData['token_type'] . ' ' . $tokenData['access_token'];
     }
 }
