@@ -170,35 +170,11 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         return $providedAttributes;
     }
 
-    protected function doRequest($body, $username)
-    {
-        $req = curl_init($this->url);
-        curl_setopt($req, CURLOPT_POST, 1);
-        curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($req, CURLOPT_HTTPHEADER, [
-            'Content-type: application/xml; charset=utf-8',
-        ]);
-        curl_setopt($req, CURLOPT_POSTFIELDS, $body);
-        if ($this->proxyServer) {
-            curl_setopt($req, CURLOPT_PROXY, $this->proxyServer);
-        }
-
-        if ($this->trustSSLHost) {
-            curl_setopt($req, CURLOPT_SSL_VERIFYHOST, 0);
-            curl_setopt($req, CURLOPT_SSL_VERIFYPEER, 0);
-        } else {
-            curl_setopt($req, CURLOPT_VERBOSE, 1);
-            curl_setopt($req, CURLOPT_CERTINFO, 1);
-
-            if (!empty($this->certificateAuthority)) {
-                curl_setopt($req, CURLOPT_CAINFO, $this->certificateAuthority);
-            }
-        }
-
+    protected function doRequest($body, $username) {
         // Do not log the real NCIP request body, it contains private credentials!!!!
         \SimpleSAML\Logger::debug("NCIP request sent to $this->url: ". $this->getLookupUserRequest($username, "********"));
 
-        $response = curl_exec($req);
+        $response = $this->doHttpRequest($this->url, $body);
         \SimpleSAML\Logger::debug("NCIP response: ". $response);
         $result = simplexml_load_string($response);
 
@@ -276,5 +252,39 @@ XML;
             }
         }
         return false;
+    }
+
+    /**
+     * Do HTTP request
+     *
+     * @param string $url  URL to request
+     * @param string $body Request body
+     *
+     * @return bool|string
+     */
+    protected function doHttpRequest(string $url, string $body)
+    {
+        $req = curl_init($url);
+        curl_setopt($req, CURLOPT_POST, 1);
+        curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($req, CURLOPT_HTTPHEADER, array(
+            'Content-type: application/xml; charset=utf-8',
+        ));
+        curl_setopt($req, CURLOPT_POSTFIELDS, $body);
+        if ($this->proxyServer) {
+            curl_setopt($req, CURLOPT_PROXY, $this->proxyServer);
+        }
+
+        if ($this->trustSSLHost) {
+            curl_setopt($req, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($req, CURLOPT_SSL_VERIFYPEER, 0);
+        } else {
+            curl_setopt($req, CURLOPT_VERBOSE, 1);
+            curl_setopt($req, CURLOPT_CERTINFO, 1);
+
+            if (!empty($this->certificateAuthority))
+                curl_setopt($req, CURLOPT_CAINFO, $this->certificateAuthority);
+        }
+        return curl_exec($req);
     }
 }
