@@ -335,7 +335,7 @@ XML;
     {
         $headers = ['Accept: application/json'];
         $postFields = [
-            'grant_type' => $this->oAuth2['grantType'] ?? 'client_credentials';
+            'grant_type' => $this->oAuth2['grantType'] ?? 'client_credentials',
         ];
         if ($this->oAuth2['tokenBasicAuth']) {
             $headers[] = 'Authorization: Basic ' . base64_encode($this->oAuth2['clientId'] . ':' . $this->oAuth2['clientSecret']);
