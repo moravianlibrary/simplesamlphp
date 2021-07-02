@@ -97,3 +97,15 @@ a.register:visited {
 	text-decoration: none;
 }
 
+.loginform-wrapper {
+	display: none;
+}
+
+.login-footer:before {
+	content: "Omlouváme se, ale služba je dočasně nedostupná. / We're sorry, but the service is temporarily unavailable.";
+	font-weight: bold;
+}
+
+.login-footer p {
+	display: none;
+}
