@@ -245,3 +245,6 @@ typings/
 
 # PHPunit
 .phpunit.result.cache
+
+# Composer lock
+composer.lock
