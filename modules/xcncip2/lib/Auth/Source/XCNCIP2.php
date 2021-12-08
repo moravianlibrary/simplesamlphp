@@ -1,0 +1,357 @@
+<?php
+namespace SimpleSAML\Module\xcncip2\Auth\Source;
+
+use SimpleSAML\Error\Exception;
+
+class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
+{
+
+    const MEMBER_AFFILIATION = 'member';
+    const LIBRARY_WALK_IN_AFFILIATION = 'library-walk-in';
+
+    protected $url;
+
+    protected $eppnScope;
+
+    protected $trustSSLHost;
+
+    protected $certificateAuthority;
+
+    protected $toAgencyId;
+
+    protected $fromAgencyId;
+
+    protected $needsUsername;
+
+    protected $organizationName;
+
+    protected $proxyServer;
+
+    protected $excludeAcademicDegrees;
+
+    /**
+     * OAuth2 configuration if needed
+     *
+     * @var array
+     */
+    protected $oAuth2;
+
+    protected $blockTypesForDnnt = [
+        'Block Electronic Resource Access',
+        'Extended Services'
+    ];
+
+    public function __construct($info, &$config)
+    {
+        parent::__construct($info, $config);
+
+        $this->url = $config['url'];
+        $this->eppnScope = $config['eppnScope'];
+        if (empty($this->eppnScope)) {
+            throw new \SimpleSAML\Error\Exception(
+                'Cannot have eppnScope empty! .. You have to set it in authsource.php'
+            );
+        }
+
+        $this->trustSSLHost = $config['trustSSLHost'];
+        $this->certificateAuthority = $config['certificateAuthority'];
+        $this->toAgencyId = $config['toAgencyId'];
+        $this->fromAgencyId = $config['fromAgencyId'];
+        $this->organizationName = $config['organizationName'];
+        $this->needsUsername = isset($config['needsUsername']) ? $config['needsUsername'] : false;
+        $this->excludeAcademicDegrees = isset($config['excludeAcademicDegrees']) ?
+            $config['excludeAcademicDegrees'] : false;
+        $this->oAuth2 = $config['oAuth2'] ?? [];
+        $this->validateOAuth2configuration();
+
+        $config = \SimpleSAML\Configuration::getConfig();
+        $this->proxyServer = $config->getValue('proxy');
+    }
+
+    public function login($username, $password)
+    {
+        $requestBody = $this->getLookupUserRequest($username, $password);
+        $response = $this->doRequest($requestBody, $username);
+        $id = $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserId/ns1:UserIdentifierValue'
+        );
+        if (empty($id)) {
+            throw new \SimpleSAML\Error\Error('WRONGUSERPASS');
+        }
+        $userId = trim((String) $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserId/ns1:UserIdentifierValue'
+        )[0]);
+        if (empty($userId)) {
+            throw new Exception('UserId was not found - cannot continue without user\'s Institution Id Number');
+        }
+        $agencyId = trim((String) $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserId/ns1:AgencyId'
+        )[0]);
+        // Tritius - email is in PhysicalAddress
+        $electronicAddresses = array_merge(
+            $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserAddressInformation/ns1:ElectronicAddress'),
+            $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserAddressInformation/ns1:PhysicalAddress')
+        );
+        $mail = $telephoneNumber = null;
+        foreach ($electronicAddresses as $recent) {
+            $recent->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+            $type = $recent->xpath('ns1:ElectronicAddressType');
+            $data = $recent->xpath('ns1:ElectronicAddressData');
+            if (empty($type) || empty($data)) {
+                continue;
+            }
+            $type = (String) $type[0];
+            $data = trim((String) $data[0]);
+            if (strpos($type, 'mail') !== false) {
+                $mail = $data;
+            } elseif (strpos($type, 'tel') !== false) {
+                $telephoneNumber = $data;
+            }
+        }
+        $firstname = trim((String) $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:NameInformation/' .
+                'ns1:PersonalNameInformation/ns1:StructuredPersonalUserName/ns1:GivenName'
+        )[0]);
+        $lastname = trim((String) $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:NameInformation/' .
+                'ns1:PersonalNameInformation/ns1:StructuredPersonalUserName/ns1:Surname'
+        )[0]);
+        $unstructuredName = trim((String) $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:NameInformation/' .
+                'ns1:PersonalNameInformation/ns1:UnstructuredPersonalUserName'
+        )[0]);
+        $validToDate = $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserPrivilege/' .
+            'ns1:ValidToDate'
+        );
+        $validToDate = !empty($validToDate)
+            ? new \DateTime((string)$validToDate[0]) : null;
+        $current = new \DateTime();
+        $affiliation = ($validToDate >= $current
+            && !$this->isUserBlockedForDnnt($response))
+            ? self::MEMBER_AFFILIATION : self::LIBRARY_WALK_IN_AFFILIATION;
+
+        $academicDegrees = [];
+        if (! empty($unstructuredName)) {
+            // Assume the last word is firstname, all other words are part of lastname
+            $names = preg_split('/[\s,]+/', $unstructuredName);
+            // Look for academic degrees to extract those
+            $i = 0;
+            foreach ($names as $name) {
+                if (preg_match('/\w+\.|^et$/', $name)) {
+                    $academicDegrees[] = $name;
+                    unset($names[$i]);
+                }
+                ++$i;
+            }
+            if (empty($firstname)) {
+                $firstname = $names[count($names) - 1];
+            }
+            unset($names[count($names) - 1]);
+            if (empty($lastname)) {
+                $lastname = implode(' ', $names);
+            }
+        }
+        $fullname = trim($firstname . ' ' . $lastname);
+        if (! $this->excludeAcademicDegrees) {
+            $academicDegreesWordy = array_reduce($academicDegrees, function ($a, $b) {
+                return $a . ' ' . $b;
+            });
+            if (! empty($academicDegreesWordy)) {
+                $fullname .= ' ' . $academicDegreesWordy;
+            }
+        }
+        $providedAttributes = [
+            'eduPersonPrincipalName' => [$userId . '@' . $this->eppnScope],
+            'eduPersonUniqueId' => [$userId . '@' . $this->eppnScope],
+            'unstructuredName' => [$userId],
+            'eduPersonAffiliation' => [$affiliation],
+            'userLibraryId' => [$userId],
+            'givenName' => empty($firstname) ? [] : [$firstname],
+            'sn' => empty($lastname) ? [] : [$lastname],
+            'cn' => empty($fullname) ? [] : [$fullname],
+            'o' => empty($this->organizationName) ? [] : [$this->organizationName],
+            'userHomeLibrary' => empty($agencyId) ? [] : [$agencyId],
+            'pseudonym' => [$username]
+        ];
+        if ($mail !== null) {
+            $providedAttributes['mail'] = [$mail];
+        }
+        if ($telephoneNumber !== null) {
+            $providedAttributes['telephoneNumber'] = [$telephoneNumber];
+        }
+        return $providedAttributes;
+    }
+
+    protected function doRequest($body, $username) {
+        // Do not log the real NCIP request body, it contains private credentials!!!!
+        \SimpleSAML\Logger::debug("NCIP request sent to $this->url: ". $this->getLookupUserRequest($username, "********"));
+
+        $headers = ['Content-type: application/xml; charset=utf-8'];
+        if (!empty($this->oAuth2)) {
+            $tokenHeader = $this->getOAuth2TokenHeader();
+            $headers[] = $tokenHeader;
+        }
+
+        $response = $this->doHttpRequest($this->url, $body, $headers);
+        \SimpleSAML\Logger::debug("NCIP response: ". $response);
+        $result = simplexml_load_string($response);
+
+        if (is_a($result, 'SimpleXMLElement')) {
+            $result->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+            return $result;
+        } else {
+            throw new \SimpleSAML\Error\Exception("Problem parsing XML");
+        }
+    }
+
+    protected function getLookupUserRequest($username, $password)
+    {
+        $username = htmlspecialchars($username);
+        $authInputType = $this->needsUsername ? 'Username' : 'User Id';
+        $password = htmlspecialchars($password);
+        return <<<XML
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns1:NCIPMessage xmlns:ns1="http://www.niso.org/2008/ncip" ns1:version="http://www.niso.org/schemas/ncip/v2_0/imp1/xsd/ncip_v2_0.xsd">
+    <ns1:LookupUser>
+        <ns1:InitiationHeader>
+            <ns1:FromAgencyId>
+                <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">$this->fromAgencyId</ns1:AgencyId>
+            </ns1:FromAgencyId>
+            <ns1:ToAgencyId>
+                <ns1:AgencyId ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/agencyidtype/agencyidtype.scm">$this->toAgencyId</ns1:AgencyId>
+            </ns1:ToAgencyId>
+        </ns1:InitiationHeader>
+        <ns1:AuthenticationInput>
+            <ns1:AuthenticationInputData>$username</ns1:AuthenticationInputData>
+            <ns1:AuthenticationDataFormatType>text/plain</ns1:AuthenticationDataFormatType>
+            <ns1:AuthenticationInputType>$authInputType</ns1:AuthenticationInputType>
+        </ns1:AuthenticationInput>
+        <ns1:AuthenticationInput>
+            <ns1:AuthenticationInputData>$password</ns1:AuthenticationInputData>
+            <ns1:AuthenticationDataFormatType>text/plain</ns1:AuthenticationDataFormatType>
+            <ns1:AuthenticationInputType>Password</ns1:AuthenticationInputType>
+        </ns1:AuthenticationInput>
+        <ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">Name Information</ns1:UserElementType>
+        <ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Address Information</ns1:UserElementType>
+        <ns1:UserElementType ns1:Scheme="http://www.niso.org/ncip/v1_0/schemes/userelementtype/userelementtype.scm">User Privilege</ns1:UserElementType>
+    </ns1:LookupUser>
+</ns1:NCIPMessage>
+XML;
+    }
+
+    /**
+     * Converts all accent characters to ASCII characters.
+     *
+     * If there are no accent characters, then the string given is just returned.
+     *
+     * @param string $string Text that might have accent characters
+     * @return string Filtered string with replaced "nice" characters.
+     */
+    protected function removeAccents($string)
+    {
+        return iconv("UTF-8", "ASCII//TRANSLIT", $string);
+    }
+
+    /**
+     * Check if user should be blocked for electronic reseurces access
+     *
+     * @param \SimpleXmlElement $response NCIP response
+     * @return bool true if user should be blocked
+     */
+    protected function isUserBlockedForDnnt($response)
+    {
+        $blockOrTrap = $response->xpath(
+            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:BlockOrTrap/' .
+            'ns1:BlockOrTrapType'
+        );
+        foreach ($blockOrTrap as $block) {
+            if (in_array((string)$block, $this->blockTypesForDnnt)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Do HTTP request
+     *
+     * @param string $url  URL to request
+     * @param string $body Request body
+     *
+     * @return bool|string
+     */
+    protected function doHttpRequest(string $url, string $body, array $headers = ['Content-type: application/xml; charset=utf-8'])
+    {
+        $req = curl_init($url);
+        curl_setopt($req, CURLOPT_POST, 1);
+        curl_setopt($req, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($req, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($req, CURLOPT_POSTFIELDS, $body);
+        if ($this->proxyServer) {
+            curl_setopt($req, CURLOPT_PROXY, $this->proxyServer);
+        }
+
+        if ($this->trustSSLHost) {
+            curl_setopt($req, CURLOPT_SSL_VERIFYHOST, 0);
+            curl_setopt($req, CURLOPT_SSL_VERIFYPEER, 0);
+        } else {
+            curl_setopt($req, CURLOPT_VERBOSE, 1);
+            curl_setopt($req, CURLOPT_CERTINFO, 1);
+
+            if (!empty($this->certificateAuthority))
+                curl_setopt($req, CURLOPT_CAINFO, $this->certificateAuthority);
+        }
+        return curl_exec($req);
+    }
+
+    /**
+     * Validate OAuth2 configuration options
+     *
+     * @return void
+     * @throws Exception
+     */
+    protected function validateOAuth2configuration(): void
+    {
+        // empty config, not using OAuth2
+        if (empty($this->oAuth2)) {
+           return;
+        }
+        $neededOptions = ['tokenEndpoint', 'clientId', 'clientSecret'];
+        foreach ($neededOptions as $option ) {
+            if (empty($this->oAuth2[$option] ?? null)) {
+                throw new Exception(sprintf('Missing needed configuration for OAuth2: ' . $option));
+            }
+        }
+    }
+
+    /**
+     * Return header string for authorization
+     *
+     * @return string
+     * @throws Exception
+     */
+    protected function getOAuth2TokenHeader()
+    {
+        $headers = ['Accept: application/json'];
+        $postFields = [
+            'grant_type' => $this->oAuth2['grantType'] ?? 'client_credentials',
+        ];
+        if ($this->oAuth2['tokenBasicAuth']) {
+            $headers[] = 'Authorization: Basic ' . base64_encode($this->oAuth2['clientId'] . ':' . $this->oAuth2['clientSecret']);
+        } else {
+            $postFields['client_id'] = $this->oAuth2['clientId'];
+            $postFields['client_secret'] = $this->oAuth2['clientSecret'];
+        }
+        $body = http_build_query($postFields);
+        $response = $this->doHttpRequest($this->oAuth2['tokenEndpoint'], $body, $headers);
+        if ($response === false) {
+            throw new Exception('Error while getting OAuth2 access token');
+        }
+        $tokenData = json_decode($response, true);
+        if (key_exists('error', $tokenData)) {
+            throw new Exception('Error while getting OAuth2 access token: ' . $tokenData['error']);
+        }
+        return 'Authorization: ' . $tokenData['token_type'] . ' ' . $tokenData['access_token'];
+    }
+}
