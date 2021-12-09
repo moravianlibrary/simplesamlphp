@@ -4,6 +4,8 @@ namespace SimpleSAML\Module\mzk\Auth\Process;
 
 class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
 
+    const CESNET_CERT_GROUP = 'CN=cesnet-tcs-certs,OU=Groups,DC=staff,DC=mzk,DC=cz';
+
     /**
      * Initialize this filter.
      *
@@ -21,7 +23,9 @@ class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
      */
     public function process(&$request) {
         $attributes = &$request['Attributes'];
-        if ($attributes["ldap.source"][0] == "employees") {
+        $employee = isset($attributes["ldap.source"])
+            && $attributes["ldap.source"][0] == "employees";
+        if ($employee) {
             $attributes["uid"] = $attributes["id"];
             $attributes["eduPersonAffiliation"][] = "staff";
             $attributes["eduPersonScopedAffiliation"][] = "staff@mzk.cz";
@@ -31,7 +35,8 @@ class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
             $attributes["eduPersonScopedAffiliation"][] = "employee@mzk.cz";
             $attributes["mzkPermission"][] = "wifi";
             $attributes["eduPersonEntitlement"][] = "urn:mace:dir:entitlement:common-lib-terms";
-            if (in_array('CN=cesnet-tcs-certs,OU=Groups,DC=staff,DC=mzk,DC=cz', $attributes['memberOf'])) {
+            if (isset($attributes['memberOf']) && is_array($attributes['memberOf'])
+                && in_array(self::CESNET_CERT_GROUP, $attributes['memberOf'])) {
                 $attributes["eduPersonEntitlement"][] = "urn:mace:terena.org:tcs:personal-user";
                 $attributes["eduPersonEntitlement"][] = "urn:mace:terena.org:tcs:escience-user";
             }
