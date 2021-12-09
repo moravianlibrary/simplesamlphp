@@ -33,13 +33,12 @@ class EduPersonTargetedIDLogger extends \SimpleSAML\Auth\ProcessingFilter {
         assert('array_key_exists("Attributes", $request)');
         $attributes = &$request['Attributes'];
         $metadata = &$request['SPMetadata'];
-        $pseudonym = $attributes['pseudonym'][0];
-        $eduPersonPrincipalName = $attributes['eduPersonPrincipalName'][0];
-        $eduPersonTargetedID = $attributes['eduPersonTargetedID'][0]->getValue();
         $pseudonym = null;
-        if (!empty($attributes['pseudonym'])) {
+        if (isset($attributes['pseudonym']) && is_array($attributes['pseudonym'])) {
             $pseudonym = $attributes['pseudonym'][0];
         }
+        $eduPersonPrincipalName = $attributes['eduPersonPrincipalName'][0];
+        $eduPersonTargetedID = $attributes['eduPersonTargetedID'][0]->getValue();
         $consumerService = $metadata['entityid'];
         if ($pseudonym != null) {
             \SimpleSAML\Logger::info("User $eduPersonPrincipalName ($eduPersonTargetedID) with"
