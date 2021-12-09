@@ -316,7 +316,9 @@ class SAMLBuilder
 
         if ($metadata->hasValue('RepublishTargets')) {
             $republishRequest = new \SimpleSAML\Metadata\XML\RepublishRequest($metadata->getArray('RepublishTargets'));
-            $this->entityDescriptor->Extensions[] = $republishRequest;
+            $extensions = $this->entityDescriptor->getExtensions();
+            $extensions[] = $republishRequest;
+            $this->entityDescriptor->setExtensions($extensions);
         }
 
     }
