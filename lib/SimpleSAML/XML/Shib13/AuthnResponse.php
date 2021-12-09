@@ -477,7 +477,9 @@ class AuthnResponse
             if ($base64) {
                 $value = base64_encode($value);
             }
-
+            if (is_object($value)) {
+                $value = (string) $value;
+            }
             $attr .= '<AttributeValue' . $scopePart . '>' . htmlspecialchars($value) . '</AttributeValue>';
         }
         $attr .= '</Attribute>';
