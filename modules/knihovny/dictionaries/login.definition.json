@@ -4,5 +4,8 @@
 	},
 	"institution_login": {
 		"en": "Institution login"
+	},
+	"registration": {
+		"en": "Registration"
 	}
 }

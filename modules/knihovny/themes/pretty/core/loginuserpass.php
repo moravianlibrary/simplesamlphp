@@ -3,6 +3,33 @@
 	if (isset($_SERVER['SIMPLESAMLPHP_THEME'])) {
 		$theme = $_SERVER['SIMPLESAMLPHP_THEME'];
 	}
+	$institutions = \SimpleSAML\Configuration::getConfig('institutions.php');
+	$institution = $institutions->getArray($_SERVER['SIMPLESAMLPHP_INSTITUTION'], null);
+
+	$current_lang = "en";
+	$languages = $this->getLanguageList();
+	foreach ($languages AS $lang => $current) {
+		if ($current) {
+			$current_lang = $lang;
+		}
+	}
+	if ($current_lang == 'en') {
+		$switch_lang = 'cs';
+	} else {
+		$switch_lang = 'en';
+	}
+	$params = array('language' => $switch_lang);
+	foreach ($this->data['stateparams'] as $name => $value) {
+		$params[$name] = $value;
+	}
+	$href = htmlspecialchars(SimpleSAML\Utilities::addURLparameter(SimpleSAML\Utilities::selfURL(), $params));
+	$img = SimpleSAML\Module::getModuleURL('knihovny/' . $switch_lang . '.gif');
+	$lang = "<a href='$href'> <img align='right' src='$img'/> </a>";
+	$login_str = ($current_lang == 'en')?"Username":"Uživatelské jméno";
+	$loginRecoveryLink = $institution['LoginRecoveryLink'][$current_lang] ?? '';
+	$passwordRecoveryLink = $institution['PasswordRecoveryLink'][$current_lang] ?? '';
+	$registerLink = $institution['RegisterLink'][$current_lang] ?? '';
+	$error = false;
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" data-tldr="true">
@@ -30,36 +57,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 '//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','GTM-TXJ544');</script>
 <!-- End Google Tag Manager -->
-
-<?php
-	$loginRecoveryLink = "";
-	$passwordRecoveryLink = "";
-	$registeryLink = "";
-
-	$current_lang = "en";
-	$languages = $this->getLanguageList();
-	foreach ($languages AS $lang => $current) {
-		if ($current) {
-			$current_lang = $lang;
-		}
-	}
-	if ($current_lang == 'en') {
-		$switch_lang = 'cs';
-	} else {
-		$switch_lang = 'en';
-	}
-	$params = array('language' => $switch_lang);
-	foreach ($this->data['stateparams'] as $name => $value) {
-		$params[$name] = $value;
-	}
-	$href = htmlspecialchars(SimpleSAML\Utilities::addURLparameter(SimpleSAML\Utilities::selfURL(), $params));
-	$img = SimpleSAML\Module::getModuleURL('knihovny/'.$switch_lang.'.gif');
-	$lang = "<a href='$href'> <img align='right' src='$img'/> </a>";
-	$login_str = ($current_lang == 'en')?"Username":"Uživatelské jméno";
-
-	$error = false;
-?>
-
 <div class="container">
 	<div class="login-header">
 		<!-- <p class="lng-switch"><?php echo $lang ?></p> -->
@@ -92,8 +89,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 				
 				<div class="login-btn">
 					<input class="btn-large" type="submit" name="wp-submit" id="wp-submit" value="<?php echo $this->t('{login:login_button}'); ?> &raquo;" tabindex="100" />
-					<?php if (!empty($registeryLink)): ?>
-						<a class="btn" href="<?php echo $registeryLink ?>" title="Nejste u nás zaregistrovaní? Přejděte na online předregistraci"><?php echo $this->t('{login:registration}'); ?>&nbsp;&raquo;</a>
+					<?php if (!empty($registerLink)): ?>
+						<a class="btn" target="_blank" href="<?php echo $registerLink ?>" title="Nejste u nás zaregistrovaní? Přejděte na online předregistraci"><?php echo $this->t('{knihovny:login:registration}'); ?>&nbsp;&raquo;</a>
 					<?php endif; ?>
 				</div>
 

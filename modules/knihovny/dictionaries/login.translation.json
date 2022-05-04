@@ -4,5 +4,8 @@
 	},
 	"institution_login": {
 		"cs": "Jednotné přihlášení"
+	},
+	"registration": {
+		"cs": "Registrace"
 	}
 }
