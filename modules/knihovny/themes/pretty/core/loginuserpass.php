@@ -1,10 +1,7 @@
 <?php
-	$theme = 'light';
-	if (isset($_SERVER['SIMPLESAMLPHP_THEME'])) {
-		$theme = $_SERVER['SIMPLESAMLPHP_THEME'];
-	}
 	$institutions = \SimpleSAML\Configuration::getConfig('institutions.php');
 	$institution = $institutions->getArray($_SERVER['SIMPLESAMLPHP_INSTITUTION'], null);
+	$theme = $institution['theme'] ?? 'light';
 
 	$current_lang = "en";
 	$languages = $this->getLanguageList();
