@@ -108,18 +108,9 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
                 $telephoneNumber = $data;
             }
         }
-        $firstname = trim((String) $response->xpath(
-            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:NameInformation/' .
-                'ns1:PersonalNameInformation/ns1:StructuredPersonalUserName/ns1:GivenName'
-        )[0]);
-        $lastname = trim((String) $response->xpath(
-            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:NameInformation/' .
-                'ns1:PersonalNameInformation/ns1:StructuredPersonalUserName/ns1:Surname'
-        )[0]);
-        $unstructuredName = trim((String) $response->xpath(
-            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:NameInformation/' .
-                'ns1:PersonalNameInformation/ns1:UnstructuredPersonalUserName'
-        )[0]);
+        $firstname = $this->extractPersonalAttribute($response, 'ns1:StructuredPersonalUserName/ns1:GivenName');
+        $lastname = $this->extractPersonalAttribute($response, 'ns1:StructuredPersonalUserName/ns1:Surname');
+        $unstructuredName = $this->extractPersonalAttribute($response, 'ns1:UnstructuredPersonalUserName');
         $validToDate = $response->xpath(
             'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserPrivilege/' .
             'ns1:ValidToDate'
@@ -181,6 +172,17 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             $providedAttributes['telephoneNumber'] = [$telephoneNumber];
         }
         return $providedAttributes;
+    }
+
+    protected function extractPersonalAttribute($response, $attribute) {
+        $value = current($response->xpath(
+            'ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:NameInformation/' .
+                'ns1:PersonalNameInformation/' . $attribute
+        ));
+        if ($value !== false) {
+            return trim((String) $value);
+        }
+        return null;
     }
 
     protected function doRequest($body, $username) {
