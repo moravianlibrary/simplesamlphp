@@ -19,7 +19,7 @@ class PairwiseID extends \SimpleSAML\Auth\ProcessingFilter {
     }
 
     /**
-     * Add commonNameASCII generated from CN
+     * Add pairwise-id attribute
      *
      * @param array &$request  The current request
      */
