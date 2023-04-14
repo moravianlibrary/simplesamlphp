@@ -8,14 +8,6 @@ class PairwiseID extends \SimpleSAML\Auth\ProcessingFilter {
 
     protected const ATTR_PAIRWISE_ID = 'urn:oasis:names:tc:SAML:attribute:pairwise-id';
 
-
-    /**
-     * The configuration.
-     *
-     * Associative array of strings.
-     */
-    private $config = array();
-
     /**
      * Initialize this filter.
      *
@@ -24,7 +16,6 @@ class PairwiseID extends \SimpleSAML\Auth\ProcessingFilter {
      */
     public function __construct($config, $reserved) {
         parent::__construct($config, $reserved);
-        $this->config = $config;
     }
 
     /**
@@ -42,7 +33,6 @@ class PairwiseID extends \SimpleSAML\Auth\ProcessingFilter {
         }
         $entityId = $metadata['entityid'];
         $secretSalt = Utils\Config::getSecretSalt();
-        $uid = $attributes['uid'][0];
         $hash = hash_hmac('sha256', $uid . '|' . $entityId, $secretSalt, false);
         $value = $hash . '@' . strtolower($scope);
         $attributes[self::ATTR_PAIRWISE_ID][] = $value;
