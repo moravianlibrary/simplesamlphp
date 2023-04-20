@@ -16,6 +16,7 @@ class PairwiseID extends \SimpleSAML\Auth\ProcessingFilter {
      */
     public function __construct($config, $reserved) {
         parent::__construct($config, $reserved);
+        $this->config = $config;
     }
 
     /**
@@ -26,7 +27,8 @@ class PairwiseID extends \SimpleSAML\Auth\ProcessingFilter {
     public function process(&$request) {
         $attributes = &$request['Attributes'];
         $metadata = &$request['SPMetadata'];
-        $uid = $attributes['uid'][0];
+        $attribute = $this->config['identifyingAttribute'] ?? 'unstructuredName';
+        $uid = $attributes[$attribute][0];
         $scope = $attributes['schacHomeOrganization'][0];
         if ($uid == null || $scope == null) {
             return;
