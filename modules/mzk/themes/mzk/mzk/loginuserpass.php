@@ -11,12 +11,12 @@ $maintenance_file = '/opt/shibboleth/simplesamlphp/config/maintenance.txt';
 
 <?php
     $employee = ($_SERVER['REMOTE_ADDR'] == "195.113.155.2");
-    $login_str = $this->t('{login:username}') . "&nbsp;<a href='http://www.mzk.cz/sluzby/navody/jak-se-prihlasit-do-katalogu'" 
+    $login_str = $this->t('{login:username}') . "&nbsp;<a href='http://www.mzk.cz/sluzby/navody/jak-se-prihlasit-do-katalogu'"
         ."target='_blank' style='text-decoration: none;'>(" . $this->t('{mzk:login:login_help}') . ")</a>";
     if ($employee) {
         $login_str = ($current_lang == 'en')?"Username":"Uživatelské jménof";
     }
-        $reg_link = 'https://www.mzk.cz/registration_mzk';
+    $reg_link = 'https://registrace.mzk.cz/';
     $error = false;
     $content = file_exists($maintenance_file) ? trim(file_get_contents($maintenance_file)) : "";
     if ($content != "") {
