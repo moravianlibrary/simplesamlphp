@@ -9,6 +9,10 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
     const MEMBER_AFFILIATION = 'member';
     const LIBRARY_WALK_IN_AFFILIATION = 'library-walk-in';
 
+    const EMPLOYEE = 'employee';
+
+    const STAFF = 'staff';
+
     protected $url;
 
     protected $eppnScope;
@@ -28,6 +32,8 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
     protected $proxyServer;
 
     protected $excludeAcademicDegrees;
+
+    protected $employeeUserPrivilegeDescription;
 
     /**
      * OAuth2 configuration if needed
@@ -62,6 +68,7 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         $this->excludeAcademicDegrees = isset($config['excludeAcademicDegrees']) ?
             $config['excludeAcademicDegrees'] : false;
         $this->oAuth2 = $config['oAuth2'] ?? [];
+        $this->employeeUserPrivilegeDescription = $config['employeeUserPrivilegeDescription'] ?? null;
         $this->validateOAuth2configuration();
 
         $config = \SimpleSAML\Configuration::getConfig();
@@ -118,9 +125,26 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
         $validToDate = !empty($validToDate)
             ? new \DateTime((string)$validToDate[0]) : null;
         $current = new \DateTime();
-        $affiliation = ($validToDate >= $current
+
+        $mainAffiliation = ($validToDate >= $current
             && !$this->isUserBlockedForDnnt($response))
             ? self::MEMBER_AFFILIATION : self::LIBRARY_WALK_IN_AFFILIATION;
+        $affiliations = [ $mainAffiliation ];
+
+        $privileges = $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserPrivilege');
+        foreach ($privileges as $privilege) {
+            $privilege->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+            $description = $privilege->xpath('ns1:UserPrivilegeDescription');
+            if (empty($description)) {
+                continue;
+            }
+            $description = $description[0];
+            if ($description == $this->employeeUserPrivilegeDescription) {
+                $affiliations[] = self::EMPLOYEE;
+                $affiliations[] = self::STAFF;
+            }
+        }
+
 
         $academicDegrees = [];
         if (! empty($unstructuredName)) {
@@ -156,7 +180,7 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             'eduPersonPrincipalName' => [$userId . '@' . $this->eppnScope],
             'eduPersonUniqueId' => [$userId . '@' . $this->eppnScope],
             'unstructuredName' => [$userId],
-            'eduPersonAffiliation' => [$affiliation],
+            'eduPersonAffiliation' => $affiliations,
             'userLibraryId' => [$userId],
             'givenName' => empty($firstname) ? [] : [$firstname],
             'sn' => empty($lastname) ? [] : [$lastname],
