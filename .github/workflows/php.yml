@@ -1,10 +1,14 @@
 name: CI
 
-on:
+on:  # yamllint disable-line rule:truthy
   push:
-    branches: [ '**' ]
+    branches: ['**']
+    paths-ignore:
+      - '**.md'
   pull_request:
-    branches: [ master, release-* ]
+    branches: [master, simplesamlphp-*]
+    paths-ignore:
+      - '**.md'
 
 jobs:
   basic-tests:
@@ -105,13 +109,13 @@ jobs:
         run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
 
       - name: Security check for locked dependencies
-        uses: symfonycorp/security-checker-action@v2
+        uses: symfonycorp/security-checker-action@v3
 
       - name: Update Composer dependencies
         run: composer update --no-progress --no-suggest --prefer-dist --optimize-autoloader
 
       - name: Security check for updated dependencies
-        uses: symfonycorp/security-checker-action@v2
+        uses: symfonycorp/security-checker-action@v3
 
   sanity-check:
     name: Sanity checks

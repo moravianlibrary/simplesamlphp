@@ -5,7 +5,6 @@
     "keywords": [ "saml2", "shibboleth","oauth","ws-federation","sp","idp" ],
     "homepage": "http://simplesamlphp.org",
     "license": "LGPL-2.1-or-later",
-    "version": "v1.19.6",
     "authors": [
         {
             "name": "Andreas Åkre Solberg",
@@ -43,7 +42,7 @@
         "ext-hash": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "gettext/gettext": "v4.x-dev#3e7460f8d9c90174824e3f39240bd578bb3d376a",
+        "gettext/gettext": "^4.8.7",
         "phpmailer/phpmailer": "^6.1",
         "robrichards/xmlseclibs": "^3.1",
         "simplesamlphp/assert": "^0.0.13",
@@ -66,7 +65,7 @@
         "simplesamlphp/simplesamlphp-module-ldap": "^0.9 | ^1.0",
         "simplesamlphp/simplesamlphp-module-memcookie": "^1.2",
         "simplesamlphp/simplesamlphp-module-memcachemonitor": "^0.9",
-        "simplesamlphp/simplesamlphp-module-metarefresh": "^0.10",
+        "simplesamlphp/simplesamlphp-module-metarefresh": "^0.11",
         "simplesamlphp/simplesamlphp-module-negotiate": "^0.9",
         "simplesamlphp/simplesamlphp-module-oauth": "^0.9.3",
         "simplesamlphp/simplesamlphp-module-preprodwarning": "^0.9",
@@ -90,6 +89,7 @@
         "symfony/yaml": "^4.4 || ^5.0",
         "twig/twig": "^2.14.11",
         "openid/php-openid": "2.3.0"
+        "twig/twig": "^2.15.3"
     },
     "require-dev": {
         "ext-curl": "*",
@@ -117,5 +117,6 @@
             "simplesamlphp/composer-module-installer": true,
             "composer/package-versions-deprecated": true
         }
-    }
+    },
+    "version": "1.19.9"
 }
