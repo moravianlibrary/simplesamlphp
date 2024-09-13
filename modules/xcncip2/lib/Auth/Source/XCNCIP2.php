@@ -131,17 +131,19 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             ? self::MEMBER_AFFILIATION : self::LIBRARY_WALK_IN_AFFILIATION;
         $affiliations = [ $mainAffiliation ];
 
-        $privileges = $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserPrivilege');
-        foreach ($privileges as $privilege) {
-            $privilege->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
-            $description = $privilege->xpath('ns1:UserPrivilegeDescription');
-            if (empty($description)) {
-                continue;
-            }
-            $description = $description[0];
-            if ($description == $this->employeeUserPrivilegeDescription) {
-                $affiliations[] = self::EMPLOYEE;
-                $affiliations[] = self::STAFF;
+        if ($this->employeeUserPrivilegeDescription != null) {
+            $privileges = $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserPrivilege');
+            foreach ($privileges as $privilege) {
+                $privilege->registerXPathNamespace('ns1', 'http://www.niso.org/2008/ncip');
+                $description = $privilege->xpath('ns1:UserPrivilegeDescription');
+                if (empty($description)) {
+                    continue;
+                }
+                $description = $description[0];
+                if ($description == $this->employeeUserPrivilegeDescription) {
+                    $affiliations[] = self::EMPLOYEE;
+                    $affiliations[] = self::STAFF;
+                }
             }
         }
 
