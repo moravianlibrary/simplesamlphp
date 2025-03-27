@@ -68,16 +68,6 @@ $maintenance_file = '/opt/shibboleth/simplesamlphp/config/maintenance.txt';
         </div>
 
         <br />
-        <div>
-            <?php
-                foreach ($this->data['stateparams'] as $name => $value) {
-                    $params[$name] = $value;
-                }
-                $params['source'] = 'mojeid';
-                $href = htmlspecialchars(\SimpleSAML\Utilities::addURLparameter(SimpleSAML\Utilities::selfURL(), $params));
-            ?>
-            <a href="<?php echo $href?>"><img src="<?=\SimpleSAML\Module::getModuleURL('mzk/mojeid.png');?>"></img></a>
-        </div>
 
         <div class="login-footer">
             <p><?php echo $this->t('{mzk:login:login_comment}'); ?></p>
