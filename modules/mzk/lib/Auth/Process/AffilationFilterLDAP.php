@@ -4,7 +4,7 @@ namespace SimpleSAML\Module\mzk\Auth\Process;
 
 class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
 
-    const CESNET_CERT_GROUP = 'CN=cesnet-tcs-certs,OU=Groups,DC=staff,DC=mzk,DC=cz';
+    private $mapping = [];
 
     /**
      * Initialize this filter.
@@ -14,6 +14,7 @@ class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
      */
     public function __construct($config, $reserved) {
         parent::__construct($config, $reserved);
+        $this->mapping = $config['mapping'] ?? [];
     }
 
     /**
@@ -34,12 +35,8 @@ class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
             $attributes["eduPersonAffiliation"][] = "employee";
             $attributes["eduPersonScopedAffiliation"][] = "employee@mzk.cz";
             $attributes["mzkPermission"][] = "wifi";
-            $attributes["eduPersonEntitlement"][] = "urn:mace:dir:entitlement:common-lib-terms";
-            if (isset($attributes['memberOf']) && is_array($attributes['memberOf'])
-                && in_array(self::CESNET_CERT_GROUP, $attributes['memberOf'])) {
-                $attributes["eduPersonEntitlement"][] = "urn:mace:terena.org:tcs:personal-user";
-                $attributes["eduPersonEntitlement"][] = "urn:mace:terena.org:tcs:escience-user";
-            }
+            $entityId = $request['SPMetadata']['entityid'];
+            $this->processEmployeeGroups($entityId, $attributes);
         }
         if (in_array('mzkWifiAccount', $attributes['objectClass'])) {
             $attributes["mzkPermission"][] = "wifi";
@@ -48,6 +45,24 @@ class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
             $attributes["eduPersonAffiliation"][] = "member";
             $attributes["eduPersonScopedAffiliation"][] = "member@mzk.cz";
             $attributes["eduPersonEntitlement"][] = "urn:mace:dir:entitlement:common-lib-terms";
+        }
+    }
+
+    protected function processEmployeeGroups($entityId, &$attributes) {
+        $attributes["eduPersonEntitlement"][] = "urn:mace:dir:entitlement:common-lib-terms";
+        if (!isset($attributes['memberOf']) || !is_array($attributes['memberOf'])) {
+            return;
+        }
+        $mapping = $this->mapping[$entityId] ?? null;
+        if ($mapping == null) {
+            $mapping = $this->mapping['default'] ?? [];
+        }
+        foreach ($mapping as $memberOf => $entitlements) {
+            if (in_array($memberOf, $attributes['memberOf'])) {
+                foreach ($entitlements as $entitlement) {
+                    $attributes["eduPersonEntitlement"][] = $entitlement;
+                }
+            }
         }
     }
 
