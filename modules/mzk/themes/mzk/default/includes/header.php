@@ -37,7 +37,7 @@
 </head>
 <body class="login">
     <!-- Google Tag Manager -->
-    <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MBZGH4"height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript><iframe src="//www.googletagmanager.com/ns.html?id=GTM-MBZGH4" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
     new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
     j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -49,7 +49,7 @@
         <div id="login">
             <p>
                 <a href="https://www.mzk.cz/">
-                    <img src="https://www.mzk.cz/sites/mzk.cz/themes/mzk/logo.png" height="40" align="bottom" alt="logo"/>
+                    <img src="https://www.mzk.cz/themes/custom/awesome/src/images/mzk-logo.svg" height="40" align="bottom" alt="logo"/>
                 </a>
                 <span align='right'><?php echo $lang; ?></span>
             </p>

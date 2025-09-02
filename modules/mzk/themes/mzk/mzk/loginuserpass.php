@@ -11,7 +11,7 @@ $maintenance_file = '/opt/shibboleth/simplesamlphp/config/maintenance.txt';
 
 <?php
     $employee = ($_SERVER['REMOTE_ADDR'] == "195.113.155.2");
-    $login_str = $this->t('{login:username}') . "&nbsp;<a href='http://www.mzk.cz/sluzby/navody/jak-se-prihlasit-do-katalogu'"
+    $login_str = $this->t('{login:username}') . "&nbsp;<a href='https://www.mzk.cz/faq/navody/jak-se-prihlasit'"
         ."target='_blank' style='text-decoration: none;'>(" . $this->t('{mzk:login:login_help}') . ")</a>";
     if ($employee) {
         $login_str = ($current_lang == 'en')?"Username":"Uživatelské jménof";
