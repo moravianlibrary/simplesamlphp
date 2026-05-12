@@ -9,6 +9,8 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
     const MEMBER_AFFILIATION = 'member';
     const LIBRARY_WALK_IN_AFFILIATION = 'library-walk-in';
 
+    const COMMON_LIB_TERMS = 'urn:mace:dir:entitlement:common-lib-terms';
+
     const EMPLOYEE = 'employee';
 
     const STAFF = 'staff';
@@ -126,10 +128,13 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             ? new \DateTime((string)$validToDate[0]) : null;
         $current = new \DateTime();
 
-        $mainAffiliation = ($validToDate >= $current
-            && !$this->isUserBlockedForDnnt($response))
-            ? self::MEMBER_AFFILIATION : self::LIBRARY_WALK_IN_AFFILIATION;
-        $affiliations = [ $mainAffiliation ];
+        $valid = ($validToDate >= $current
+            && !$this->isUserBlockedForDnnt($response));
+        $affiliations = [ ($valid) ? self::MEMBER_AFFILIATION : self::LIBRARY_WALK_IN_AFFILIATION ];
+        $entitlements = [];
+        if ($valid) {
+            $entitlements[] = self::COMMON_LIB_TERMS;
+        }
 
         if ($this->employeeUserPrivilegeDescription != null) {
             $privileges = $response->xpath('ns1:LookupUserResponse/ns1:UserOptionalFields/ns1:UserPrivilege');
@@ -183,6 +188,7 @@ class XCNCIP2 extends \SimpleSAML\Module\core\Auth\UserPassBase
             'eduPersonUniqueId' => [$userId . '@' . $this->eppnScope],
             'unstructuredName' => [$userId],
             'eduPersonAffiliation' => $affiliations,
+            'eduPersonEntitlement' => $entitlements,
             'userLibraryId' => [$userId],
             'givenName' => empty($firstname) ? [] : [$firstname],
             'sn' => empty($lastname) ? [] : [$lastname],
