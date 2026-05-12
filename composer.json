@@ -115,6 +115,9 @@
         "allow-plugins": {
             "simplesamlphp/composer-module-installer": true,
             "composer/package-versions-deprecated": true
+        },
+	"audit": {
+            "block-insecure": false
         }
     },
     "version": "1.19.9"
