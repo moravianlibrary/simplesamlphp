@@ -371,7 +371,7 @@ XML;
         $postFields = [
             'grant_type' => $this->oAuth2['grantType'] ?? 'client_credentials',
         ];
-        if ($this->oAuth2['tokenBasicAuth']) {
+        if ($this->oAuth2['tokenBasicAuth'] ?? false) {
             $headers[] = 'Authorization: Basic ' . base64_encode($this->oAuth2['clientId'] . ':' . $this->oAuth2['clientSecret']);
         } else {
             $postFields['client_id'] = $this->oAuth2['clientId'];
@@ -383,6 +383,9 @@ XML;
             throw new Exception('Error while getting OAuth2 access token');
         }
         $tokenData = json_decode($response, true);
+        if (!is_array($tokenData)) {
+            throw new Exception('Error while getting OAuth2 access token: invalid response');
+        }
         if (key_exists('error', $tokenData)) {
             throw new Exception('Error while getting OAuth2 access token: ' . $tokenData['error']);
         }

@@ -4,6 +4,8 @@ namespace SimpleSAML\Module\mzk\Auth\Process;
 
 class MetadataRequestedAttributeLimiter extends \SimpleSAML\Auth\ProcessingFilter {
 
+    private $config = array();
+
     /**
      * Initialize this filter.
      *

@@ -93,9 +93,19 @@
     "require-dev": {
         "ext-curl": "*",
         "mikey179/vfsstream": "~1.6",
-        "phpunit/phpunit": "^7.5",
+        "phpunit/phpunit": "^7.5 || ^8.5 || ^9.5",
         "simplesamlphp/simplesamlphp-test-framework": "^0.1.2",
-        "vimeo/psalm": "~3.14"
+        "vimeo/psalm": "~3.14 || ^4.30"
+    },
+    "conflict": {
+        "psr/cache": ">=2",
+        "symfony/deprecation-contracts": ">=3",
+        "symfony/error-handler": ">=6",
+        "symfony/event-dispatcher": ">=6",
+        "symfony/event-dispatcher-contracts": ">=3",
+        "symfony/filesystem": ">=6",
+        "symfony/string": ">=6",
+        "symfony/var-dumper": ">=6"
     },
     "suggest": {
         "predis/predis": "Needed if a Redis server is used to store session information",

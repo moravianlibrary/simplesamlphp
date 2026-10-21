@@ -8,6 +8,8 @@ class PairwiseID extends \SimpleSAML\Auth\ProcessingFilter {
 
     protected const ATTR_PAIRWISE_ID = 'urn:oasis:names:tc:SAML:attribute:pairwise-id';
 
+    private $config = array();
+
     /**
      * Initialize this filter.
      *
@@ -28,8 +30,8 @@ class PairwiseID extends \SimpleSAML\Auth\ProcessingFilter {
         $attributes = &$request['Attributes'];
         $metadata = &$request['SPMetadata'];
         $attribute = $this->config['identifyingAttribute'] ?? 'unstructuredName';
-        $uid = $attributes[$attribute][0];
-        $scope = $attributes['schacHomeOrganization'][0];
+        $uid = $attributes[$attribute][0] ?? null;
+        $scope = $attributes['schacHomeOrganization'][0] ?? null;
         if ($uid == null || $scope == null) {
             return;
         }

@@ -38,10 +38,10 @@ class AffilationFilterLDAP extends \SimpleSAML\Auth\ProcessingFilter {
             $entityId = $request['SPMetadata']['entityid'];
             $this->processEmployeeGroups($entityId, $attributes);
         }
-        if (in_array('mzkWifiAccount', $attributes['objectClass'])) {
+        if (in_array('mzkWifiAccount', $attributes['objectClass'] ?? [])) {
             $attributes["mzkPermission"][] = "wifi";
         }
-        if (in_array('mzkProxyAccount', $attributes['objectClass'])) {
+        if (in_array('mzkProxyAccount', $attributes['objectClass'] ?? [])) {
             $attributes["eduPersonAffiliation"][] = "member";
             $attributes["eduPersonScopedAffiliation"][] = "member@mzk.cz";
             $attributes["eduPersonEntitlement"][] = "urn:mace:dir:entitlement:common-lib-terms";
