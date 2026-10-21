@@ -117,11 +117,47 @@ class FileLoggingHandler implements LoggingHandlerInterface
                 }
 
                 array_push($formats, $matches[0]);
-                array_push($replacements, strftime($format));
+                array_push($replacements, self::formatDate($format));
             }
 
             $string = str_replace($formats, $replacements, $string);
             file_put_contents($this->logFile, $string . \PHP_EOL, FILE_APPEND);
         }
+    }
+
+
+    /**
+     * Format the current time using a strftime() format string.
+     *
+     * strftime() is deprecated as of PHP 8.1, so the common conversion
+     * specifiers are translated to their date() equivalents.
+     *
+     * @param string $format The strftime() format.
+     * @return string
+     */
+    private static function formatDate(string $format): string
+    {
+        $map = [
+            'a' => 'D', 'A' => 'l', 'd' => 'd', 'e' => 'j', 'j' => 'z', 'u' => 'N', 'w' => 'w',
+            'V' => 'W', 'b' => 'M', 'h' => 'M', 'B' => 'F', 'm' => 'm', 'y' => 'y', 'Y' => 'Y',
+            'G' => 'o', 'H' => 'H', 'k' => 'G', 'I' => 'h', 'l' => 'g', 'M' => 'i', 'p' => 'A',
+            'P' => 'a', 'S' => 's', 'z' => 'O', 'Z' => 'T', 's' => 'U',
+            'D' => 'm/d/y', 'F' => 'Y-m-d', 'T' => 'H:i:s', 'R' => 'H:i', 'r' => 'h:i:s A',
+        ];
+        $result = '';
+        $length = strlen($format);
+        for ($i = 0; $i < $length; $i++) {
+            $char = $format[$i];
+            if ($char === '%' && $i + 1 < $length) {
+                $spec = $format[++$i];
+                if (isset($map[$spec])) {
+                    $result .= date($map[$spec]);
+                    continue;
+                }
+                $char = ($spec === '%') ? '%' : '%' . $spec;
+            }
+            $result .= $char;
+        }
+        return $result;
     }
 }
