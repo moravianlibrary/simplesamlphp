@@ -2,11 +2,16 @@
 
 namespace SimpleSAML\Module\mzk\Auth\Process;
 
+use SimpleSAML\Configuration;
+use SimpleSAML\Logger;
+use SimpleSAML\Logger\FileLoggingHandler;
+use SimpleSAML\Session;
+
 class EduPersonTargetedIDLogger extends \SimpleSAML\Auth\ProcessingFilter {
 
     /**
-     * Path to the separate audit log file, or null if only the main
-     * SimpleSAMLphp log should be used.
+     * File to which access entries are also appended, or null if only the
+     * main SimpleSAMLphp log should be used.
      *
      * @var string|null
      */
@@ -17,8 +22,9 @@ class EduPersonTargetedIDLogger extends \SimpleSAML\Auth\ProcessingFilter {
      * Initialize this filter.
      *
      * Options:
-     *  - logfile: file to which access entries are also appended. A relative
-     *             path is resolved against the 'loggingdir' option.
+     *  - logfile: file to which access entries are also appended, using the
+     *             'logging.format' option. A relative path is resolved against
+     *             the 'loggingdir' option.
      *
      * @param array $config  Configuration information about this filter.
      * @param mixed $reserved  For future use.
@@ -26,12 +32,7 @@ class EduPersonTargetedIDLogger extends \SimpleSAML\Auth\ProcessingFilter {
     public function __construct($config, $reserved) {
         parent::__construct($config, $reserved);
         if (isset($config['logfile'])) {
-            $logFile = $config['logfile'];
-            if ($logFile[0] !== '/') {
-                $globalConfig = \SimpleSAML\Configuration::getInstance();
-                $logFile = $globalConfig->getPathValue('loggingdir', 'log/') . $logFile;
-            }
-            $this->logFile = $logFile;
+            $this->logFile = $config['logfile'];
         }
     }
 
@@ -59,14 +60,46 @@ class EduPersonTargetedIDLogger extends \SimpleSAML\Auth\ProcessingFilter {
         } else {
             $message = "User $eduPersonPrincipalName ($eduPersonTargetedID) accesses $consumerService";
         }
-        \SimpleSAML\Logger::info($message);
+        Logger::info($message);
         if ($this->logFile !== null) {
-            $trackId = \SimpleSAML\Session::getSessionFromRequest()->getTrackID();
-            $line = date('c') . " [$trackId] $message" . PHP_EOL;
-            if (@file_put_contents($this->logFile, $line, FILE_APPEND | LOCK_EX) === false) {
-                \SimpleSAML\Logger::error("EduPersonTargetedIDLogger: could not write to {$this->logFile}");
-            }
+            $this->logToFile($message);
         }
+    }
+
+
+    /**
+     * Append the message to the separate log file, formatted the same way
+     * as the main log.
+     *
+     * The %date, %process and %level placeholders are replaced by
+     * FileLoggingHandler, the rest is done by Logger::log() in the main log,
+     * which is private, so it is replicated here.
+     *
+     * @param string $message  The message to log.
+     */
+    private function logToFile($message) {
+        $globalConfig = Configuration::getInstance();
+        $options = $globalConfig->toArray();
+        if ($this->logFile[0] === '/') {
+            $options['loggingdir'] = dirname($this->logFile);
+            $options['logging.logfile'] = basename($this->logFile);
+        } else {
+            $options['logging.logfile'] = $this->logFile;
+        }
+        try {
+            $handler = new FileLoggingHandler(Configuration::loadFromArray($options));
+        } catch (\Exception $e) {
+            Logger::error('EduPersonTargetedIDLogger: ' . $e->getMessage());
+            return;
+        }
+        $format = $globalConfig->getString('logging.format', '%date{%b %d %H:%M:%S} %process %level %stat[%trackid] %msg');
+        $handler->setLogFormat($format);
+        $line = str_replace(
+            ['%trackid', '%msg', '%srcip', '%stat'],
+            [Session::getSessionFromRequest()->getTrackID(), $message, $_SERVER['REMOTE_ADDR'] ?? 'N/A', ''],
+            $format
+        );
+        $handler->log(Logger::INFO, $line);
     }
 
 }
